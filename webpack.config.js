@@ -3,7 +3,7 @@ const CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = {
   entry: './src/main.ts',
-  devtool: 'source-map',
+  devtool: 'inline-source-map',
   mode: 'development',
   output: {
     path: path.resolve(__dirname, 'build'),
@@ -19,7 +19,7 @@ module.exports = {
 	  {
 		test: /\.m?js$/,
 		//exclude: /(node_modules|bower_components)/,
-        include: /(ape-ecs|\/src)/,
+        include: /(pixi.js|ape-ecs|\/src)/,
 		use: {
 		  loader: 'babel-loader',
 		  options: {
