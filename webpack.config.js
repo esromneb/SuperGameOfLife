@@ -20,27 +20,20 @@ module.exports = {
 		test: /\.m?js$/,
 		//exclude: /(node_modules|bower_components)/,
         include: /(pixi.js|ape-ecs|\/src)/,
-		use: {
-		  loader: 'babel-loader',
-		  options: {
-			presets: [
-              ['@babel/preset-env',
-                {
-                  targets: {
-                    chrome: 85,
-                    firefox: 82
-                  }
-                }]
-              ],
-			plugins: ["@babel/plugin-proposal-class-properties"]
-		  }
-		}
+              use: {
+                loader: 'babel-loader',
+                options: {
+                  presets: ['@babel/preset-env'],
+                  plugins: [ "@babel/plugin-proposal-class-properties"]
+                }
+              }
 	  }
 	]
   },
   plugins: [
     new CopyPlugin([
-      { from: './html/*.html', to: '', flatten: true },
+      { from: './html/*.html', to: '', flatten: false },
+      { from: './assets/*', to: '', flatten: false },
     ]),
   ],
 };
