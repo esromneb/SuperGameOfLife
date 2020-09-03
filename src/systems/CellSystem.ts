@@ -56,8 +56,8 @@ class CellSystem extends ApeECS.System {
             type: 'GraphicsSprite',
             frame: 'x',
             container: game.layers.main,
-            scale: 3,
-            color: 0xffffff
+            scale: 1,
+            color: 0xff0000
           },
           {
             type: 'Position',
@@ -68,7 +68,10 @@ class CellSystem extends ApeECS.System {
         ]
       });
 
+    // we use an id for this entity which is composed of the letter c and the tiles 
+    // coordinates.  This allows us to fetch this entity on demand if we have a tile
     const e = this.world.createEntity({
+      id: `c${tile[0]}_${tile[1]}`,
       components: [
         {
           type: 'Tile',
@@ -79,10 +82,23 @@ class CellSystem extends ApeECS.System {
         {
           type: 'Cell',
           key: 'cell',
+          sprite: s,
         }
       ]
     });
     return e;
+  }
+
+  // returns true if found
+  // false if no cell at that tile
+  destroyCell(tile: Vec2): boolean {
+    const e = this.world.getEntity(`c${tile[0]}_${tile[1]}`);
+    if( !e ) {
+      return false;
+    }
+    this.world.removeEntity(e.c.cell.sprite);
+    this.world.removeEntity(e);
+    return true;
   }
 
 

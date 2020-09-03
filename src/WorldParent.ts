@@ -65,6 +65,7 @@ class WorldParent extends Scene {
     this.sprite.drawBoundaries();
 
 
+    this.cell.addCell([0,0]);
     this.cell.addCell([1,1]);
     this.cell.addCell([2,2]);
 

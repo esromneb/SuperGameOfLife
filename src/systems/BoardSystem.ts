@@ -62,7 +62,7 @@ class BoardSystem extends ApeECS.System {
     const offset = e.c.board.tileOffset;
     const sz = e.c.board.gsize;
 
-    const x = offset[0] + tile[0] * sz[0];
+    const x =   offset[0] + tile[0] * sz[0];
     const y = 1+offset[1] + tile[1] * sz[1];  // not sure what this fudge is
 
     return [x,y];

@@ -100,7 +100,7 @@ class SpriteSystem extends ApeECS.System {
 
       //   sprite.sprite = Pixi.Sprite.from(sprite.frame);
         // sprite.sprite.anchor.set(.5);
-        // sprite.sprite.scale.set(sprite.scale);
+        sprite.sprite.scale.set(sprite.scale);
       //   sprite.sprite.tint = sprite.color;
         if (!sprite.container) {
           sprite.container = this.game.layers[sprite.layer];
@@ -115,7 +115,7 @@ class SpriteSystem extends ApeECS.System {
 
         sprite.sprite.scale.set(1);
 
-        sprite.sprite.beginFill(0xff0000).lineStyle(0,0x000000);
+        sprite.sprite.beginFill(sprite.color).lineStyle(0,0x000000);
 
         // -1 is because the grid occupies a single pixel
         // sprite.sprite.drawRect(0,0, sz[0]-1, -39);

@@ -29,7 +29,6 @@ export class GraphicsSprite extends Component {
   }
 
   preDestroy() {
-
     if (this.sprite) {
       this.sprite.destroy();
     }
@@ -71,9 +70,7 @@ export class Sprite extends Component {
 
 export class Tile extends Component {
   static properties = {
-    x: 0,
-    y: 0,
-    angle: 0
+    vec2: [0,0],
   }
 };
 
