@@ -65,16 +65,16 @@ class WorldParent extends Scene {
     this.sprite.drawBoundaries();
 
 
-    this.cell.addCell([0,0]);
-    this.cell.addCell([1,1]);
-    this.cell.addCell([1,0]);
-    this.cell.addCell([2,2]);
+    this.cell.spawnCell([0,0]);
+    this.cell.spawnCell([1,1]);
+    this.cell.spawnCell([1,0]);
+    this.cell.spawnCell([2,2]);
 
-    this.cell.addCell([5,4]);
-    this.cell.addCell([5,5]);
-    this.cell.addCell([5,6]);
-    this.cell.addCell([4,5]);
-    this.cell.addCell([6,5]);
+    this.cell.spawnCell([5,4]);
+    this.cell.spawnCell([5,5]);
+    this.cell.spawnCell([5,6]);
+    this.cell.spawnCell([4,5]);
+    this.cell.spawnCell([6,5]);
 
   }
 

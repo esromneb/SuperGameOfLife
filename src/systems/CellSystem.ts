@@ -81,8 +81,6 @@ class CellSystem extends ApeECS.System {
   // Any live cell with more than three live neighbours dies, as if by overpopulation.
   // Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
 
-
-
   calculateLife() {
     const gboard = this.world.getEntity('gboard');
     const sz = gboard.c.board.tiles;
@@ -94,12 +92,15 @@ class CellSystem extends ApeECS.System {
       for(let y = 0; y < sz[1]; y++) {
         const key = `c${x}_${y}`;
         const count = neighbors[key] = this.countNeighbors([x,y]);
+        // the rules of the game
+        // it's ok to kill a cell if it doesn't exist
         if( count < 2 ) {
           kill.push([x,y]);
         } else if( count > 3 ) {
           kill.push([x,y]);
         }
 
+        // we should guard spawnCell according to the rules
         if( count === 3 && !(this.tileHasCell([x,y]))) {
           spawn.push([x,y]);
         }
@@ -107,18 +108,25 @@ class CellSystem extends ApeECS.System {
       }
     }
 
-    console.log(neighbors);
+    // console.log(neighbors);
 
     for( let k of kill ) {
       this.destroyCell(k);
     }
 
     for(let s of spawn ) {
-      this.addCell(s);
+      this.spawnCell(s);
     }
   }
 
-  addCell(tile: Vec2): Entity {
+  // returns the new entity if spawned
+  // returns the existing one if something already exists here
+  spawnCell(tile: Vec2): Entity {
+
+    const existing = this.world.getEntity(`c${tile[0]}_${tile[1]}`);
+    if( !!existing ) {
+      return existing;
+    }
 
     const [x,y] = this.wp.board.tileToPixel(tile);
 
@@ -129,6 +137,7 @@ class CellSystem extends ApeECS.System {
         components: [
           {
             type: 'GraphicsSprite',
+            key: 's0',
             frame: 'x',
             container: game.layers.main,
             scale: 1,
@@ -161,6 +170,14 @@ class CellSystem extends ApeECS.System {
         }
       ]
     });
+    return e;
+  }
+
+  spawnIce(tile: Vec2): Entity {
+    const e = this.spawnCell(tile);
+
+    e.c.cell.sprite.c.s0.color = 0xD4F1F9;
+
     return e;
   }
 
