@@ -1,6 +1,11 @@
 import {WorldParent} from '../WorldParent'
 
 import {
+Vec2
+} from '../Types'
+
+
+import {
   System,
   World,
   Component,
@@ -38,7 +43,9 @@ class CellSystem extends ApeECS.System {
 
   }
 
-  addCell(x: number, y: number): Entity {
+  addCell(tile: Vec2): Entity {
+
+    const [x,y] = this.wp.board.tileToPixel(tile);
 
     const game = this.wp.gamec;
 
@@ -54,8 +61,8 @@ class CellSystem extends ApeECS.System {
           },
           {
             type: 'Position',
-            x: 40,
-            y: 40,
+            x,
+            y,
             angle: 0,
           }
         ]

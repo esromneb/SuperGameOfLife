@@ -64,13 +64,13 @@ class BrowserInterface {
   }
 }
 
-const bintf = new BrowserInterface({
+const inst = new BrowserInterface({
   container: document.getElementById('container')
 });
 
 
 export {
-bintf,
+inst,
 WorldParent,
 BrowserInterface,
 }

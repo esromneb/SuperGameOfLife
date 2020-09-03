@@ -41,7 +41,8 @@ class SpriteSystem extends ApeECS.System {
 
     // @ts-ignore
     this.posQuery = this.createQuery()
-      .fromAll('Sprite', 'Position')
+      .fromAny('Sprite', 'GraphicsSprite')
+      .fromAll('Position')
       .persist();
 
     // @ts-ignore
@@ -76,10 +77,10 @@ class SpriteSystem extends ApeECS.System {
       console.log('New Sprite');
     }
 
-    const pentities = this.posQuery.execute();
-    for (const entity of pentities) {
-      for (const pos of entity.getComponents('Position')) {
-        for (const sprite of entity.getComponents('Sprite')) {
+    const q = this.posQuery.execute();
+    for (const e of q) {
+      for (const pos of e.getComponents('Position')) {
+        for (const sprite of [...e.getComponents('Sprite'), ...e.getComponents('GraphicsSprite')]) {
           sprite.sprite.position.set(pos.x, pos.y);
           sprite.sprite.rotation = pos.angle + Math.PI / 2;
         }
@@ -88,6 +89,10 @@ class SpriteSystem extends ApeECS.System {
   }
 
   updateGraphicSprites(tick) {
+    // grab the gboard entity 
+    const gboard = this.world.getEntity('gboard');
+    const sz = gboard.c.board.gsize;
+
     const q = this.graphicsSpriteQuery.execute();
     for (const entity of q) {
       for (const sprite of entity.getComponents('GraphicsSprite')) {
@@ -106,13 +111,23 @@ class SpriteSystem extends ApeECS.System {
           console.log('add child');
         }
 
-        sprite.sprite.position.set(40,40);
+        // sprite.sprite.position.set(40,40);
 
-        sprite.sprite.lineStyle(2, 0xffffff)
-           .moveTo(0, 0)
-           .lineTo(10, 0)
-           .lineTo(10, 0)
-           ;
+        sprite.sprite.scale.set(1);
+
+        sprite.sprite.beginFill(0xff0000).lineStyle(0,0x000000);
+
+        // -1 is because the grid occupies a single pixel
+        // sprite.sprite.drawRect(0,0, sz[0]-1, -39);
+        // drawRect really seems backwards, seems like x and y are switched
+        // just fudged this till it worked
+        sprite.sprite.drawRect(0,0, (sz[1]-1) , -(sz[0]-1));
+
+        // sprite.sprite.lineStyle(2, 0xffffff)
+        //    .moveTo(0, 0)
+        //    .lineTo(10, 0)
+        //    .lineTo(10, 0)
+        //    ;
 
 
 
@@ -161,8 +176,7 @@ class SpriteSystem extends ApeECS.System {
     const [tilex,tiley] = this.wp.eboard.c.board.tiles;
     // const  = this.wp.eboard.c.board.y;
 
-    const sizex = this.wp.eboard.c.board.sizex;
-    const sizey = this.wp.eboard.c.board.sizey;
+    const [sizex,sizey] = this.wp.eboard.c.board.gsize;
 
     const [startx,starty] = this.wp.eboard.c.board.tileOffset;
 
@@ -173,6 +187,7 @@ class SpriteSystem extends ApeECS.System {
     const maxx = nowx + (tilex*(sizex));
     const maxy = nowy + (tiley*(sizey));
 
+    // draw vertical lines
     for(let i = 0; i < (tilex+1) ; i++) {
       cells
         .moveTo(nowx, nowy)
@@ -182,6 +197,7 @@ class SpriteSystem extends ApeECS.System {
     }
 
     nowx = startx;
+    nowy = starty;
 
 
     for(let j = 0; j < (tiley+1) ; j++) {
