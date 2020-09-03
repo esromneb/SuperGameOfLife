@@ -99,10 +99,10 @@ export class Game extends Component {
 
 export class GameBoard extends Component {
   static properties = {
-    x: 0,
-    y: 0,
-    sizex: 40,
-    sizey: 40,
+    tiles: [0,0], // how many tile in the y and y direction
+    tileOffset: [20,20], // how many pixels from 0,0 does the board start, in pixels
+    sizex: 40, // size of each tile in pixel
+    sizey: 40, // size of each tile in pixel
   }
 }
 

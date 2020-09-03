@@ -1,5 +1,8 @@
 import {WorldParent} from '../WorldParent'
 
+import {
+Vec2
+} from '../Types'
 
 import {
   System,
@@ -42,13 +45,16 @@ class BoardSystem extends ApeECS.System {
         {
           type: 'GameBoard',
           key: 'board',
-          x,
-          y
+          tiles: [x,y],
         }
       ]
     });
 
     return e;
+  }
+
+  tileToPixel(tile: Vec2): Vec2 {
+    return [0,0];
   }
 
 

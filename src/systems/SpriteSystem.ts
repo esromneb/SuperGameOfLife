@@ -73,6 +73,7 @@ class SpriteSystem extends ApeECS.System {
           sprite.container.addChild(sprite.sprite);
       }
       entity.removeTag('New');
+      console.log('New Sprite');
     }
 
     const pentities = this.posQuery.execute();
@@ -89,19 +90,23 @@ class SpriteSystem extends ApeECS.System {
   updateGraphicSprites(tick) {
     const q = this.graphicsSpriteQuery.execute();
     for (const entity of q) {
-      for (const sprite of entity.getComponents('Sprite')) {
+      for (const sprite of entity.getComponents('GraphicsSprite')) {
         sprite.sprite = new Pixi.Graphics();
 
       //   sprite.sprite = Pixi.Sprite.from(sprite.frame);
         // sprite.sprite.anchor.set(.5);
-        sprite.sprite.scale.set(sprite.scale);
+        // sprite.sprite.scale.set(sprite.scale);
       //   sprite.sprite.tint = sprite.color;
         if (!sprite.container) {
           sprite.container = this.game.layers[sprite.layer];
+          console.log('set container');
         }
         if (sprite.container) {
           sprite.container.addChild(sprite.sprite);
+          console.log('add child');
         }
+
+        sprite.sprite.position.set(40,40);
 
         sprite.sprite.lineStyle(2, 0xffffff)
            .moveTo(0, 0)
@@ -112,7 +117,8 @@ class SpriteSystem extends ApeECS.System {
 
 
       }
-      // entity.removeTag('New');
+      entity.removeTag('New');
+      console.log("Adding new Graphics Sprite");
     }
   }
 
@@ -152,17 +158,17 @@ class SpriteSystem extends ApeECS.System {
 
     const wpx = this.wp.gamec.width;
     const hpx = this.wp.gamec.height;
-    const tilex = this.wp.eboard.c.board.x;
-    const tiley = this.wp.eboard.c.board.y;
+    const [tilex,tiley] = this.wp.eboard.c.board.tiles;
+    // const  = this.wp.eboard.c.board.y;
 
     const sizex = this.wp.eboard.c.board.sizex;
     const sizey = this.wp.eboard.c.board.sizey;
 
-    const ul = 20;
+    const [startx,starty] = this.wp.eboard.c.board.tileOffset;
 
     // these are the start
-    let nowx = ul;
-    let nowy = ul;
+    let nowx = startx;
+    let nowy = starty;
 
     const maxx = nowx + (tilex*(sizex));
     const maxy = nowy + (tiley*(sizey));
@@ -175,7 +181,7 @@ class SpriteSystem extends ApeECS.System {
       nowx += sizex;
     }
 
-    nowx = ul;
+    nowx = startx;
 
 
     for(let j = 0; j < (tiley+1) ; j++) {
