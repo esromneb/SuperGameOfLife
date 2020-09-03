@@ -22,6 +22,11 @@ const ApeECS = {
   Component,
 };
 
+// Any live cell with fewer than two live neighbours dies, as if by underpopulation.
+// Any live cell with two or three live neighbours lives on to the next generation.
+// Any live cell with more than three live neighbours dies, as if by overpopulation.
+// Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
+
 class CellSystem extends ApeECS.System {
 
   // spriteQuery: Query;
@@ -39,7 +44,42 @@ class CellSystem extends ApeECS.System {
 
   }
 
+  countNeighbors(tile: Vec2): number {
+    const [x,y] = tile;
+      
+    const pos = [
+    [x-1,y-1],
+    [x-0,y-1],
+    [x+1,y-1],
+    [x+1,y-0],
+    [x+1,y+1],
+    [x-0,y+1],
+    [x-1,y+1],
+    [x-1,y+0],
+    ];
+
+    const ok = pos.filter(z=>(z[0]>=0&&z[1]>=0));
+
+    let count = 0;
+
+    for( let p of ok ) {
+      const e = this.world.getEntity(`c${p[0]}_${p[1]}`);
+      if( !!e ) {
+        count++;
+      }
+    }
+
+    return count;
+  }
+
   update(tick) {
+  }
+
+  calculateLife() {
+    const gboard = this.world.getEntity('gboard');
+    const sz = gboard.c.board.gsize;
+    let kill = {};
+
 
   }
 
