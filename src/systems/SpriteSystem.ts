@@ -104,11 +104,11 @@ class SpriteSystem extends ApeECS.System {
       //   sprite.sprite.tint = sprite.color;
         if (!sprite.container) {
           sprite.container = this.game.layers[sprite.layer];
-          console.log('set container');
+          // console.log('set container');
         }
         if (sprite.container) {
           sprite.container.addChild(sprite.sprite);
-          console.log('add child');
+          // console.log('add child');
         }
 
         // sprite.sprite.position.set(40,40);
@@ -133,7 +133,7 @@ class SpriteSystem extends ApeECS.System {
 
       }
       entity.removeTag('New');
-      console.log("Adding new Graphics Sprite");
+      // console.log("Adding new Graphics Sprite");
     }
   }
 

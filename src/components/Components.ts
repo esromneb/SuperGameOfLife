@@ -82,6 +82,12 @@ export class Position extends Component {
   }
 };
 
+export class UIState extends Component {
+  static properties = {
+    mode: 'normal',
+  }
+}
+
 
 export class Game extends Component {
   static properties = {

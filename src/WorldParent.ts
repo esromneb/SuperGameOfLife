@@ -4,6 +4,7 @@ import {Scene} from './Scene'
 import {SpriteSystem} from './systems/SpriteSystem'
 import {BoardSystem} from './systems/BoardSystem'
 import {CellSystem} from './systems/CellSystem'
+import {InputSystem} from './systems/InputSystem'
 
 // import {GlobalState} from './components/Components'
 
@@ -31,6 +32,7 @@ class WorldParent extends Scene {
   sprite: SpriteSystem;
   board: BoardSystem;
   cell: CellSystem;
+  input: InputSystem;
 
   eboard: Entity;
 
@@ -63,6 +65,7 @@ class WorldParent extends Scene {
   finalInit(): void {
     this.eboard = this.board.initBoard(12,8);
     this.sprite.drawBoundaries();
+    this.input.drawButtons();
 
 
     this.cell.spawnCell([0,0]);
@@ -90,6 +93,10 @@ class WorldParent extends Scene {
           layers: {
             'main': this
           }
+        },
+        {
+          type: 'UIState',
+          key: 'ui',
         }
       ]
     });
@@ -126,6 +133,7 @@ class WorldParent extends Scene {
     this.sprite     = this.world.registerSystem('sprite', new SpriteSystem(this.world, this));
     this.board      = this.world.registerSystem('board',  new BoardSystem(this.world, this));
     this.cell       = this.world.registerSystem('cell',   new CellSystem(this.world, this));
+    this.input      = this.world.registerSystem('input',  new InputSystem(this.world, this));
   }
 
   registerComponents(): void {
