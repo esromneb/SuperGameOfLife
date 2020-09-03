@@ -22,10 +22,6 @@ const ApeECS = {
   Component,
 };
 
-// Any live cell with fewer than two live neighbours dies, as if by underpopulation.
-// Any live cell with two or three live neighbours lives on to the next generation.
-// Any live cell with more than three live neighbours dies, as if by overpopulation.
-// Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
 
 class CellSystem extends ApeECS.System {
 
@@ -42,6 +38,11 @@ class CellSystem extends ApeECS.System {
 
   init() {
 
+  }
+
+  tileHasCell(tile: Vec2): boolean {
+    const e = this.world.getEntity(`c${tile[0]}_${tile[1]}`);
+    return !!e;
   }
 
   countNeighbors(tile: Vec2): number {
@@ -75,12 +76,46 @@ class CellSystem extends ApeECS.System {
   update(tick) {
   }
 
+  // Any live cell with fewer than two live neighbours dies, as if by underpopulation.
+  // Any live cell with two or three live neighbours lives on to the next generation.
+  // Any live cell with more than three live neighbours dies, as if by overpopulation.
+  // Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
+
+
+
   calculateLife() {
     const gboard = this.world.getEntity('gboard');
-    const sz = gboard.c.board.gsize;
-    let kill = {};
+    const sz = gboard.c.board.tiles;
+    let kill: Vec2[] = [];
+    let spawn: Vec2[] = [];
 
+    let neighbors = {};
+    for(let x = 0; x < sz[0]; x++) {
+      for(let y = 0; y < sz[1]; y++) {
+        const key = `c${x}_${y}`;
+        const count = neighbors[key] = this.countNeighbors([x,y]);
+        if( count < 2 ) {
+          kill.push([x,y]);
+        } else if( count > 3 ) {
+          kill.push([x,y]);
+        }
 
+        if( count === 3 && !(this.tileHasCell([x,y]))) {
+          spawn.push([x,y]);
+        }
+
+      }
+    }
+
+    console.log(neighbors);
+
+    for( let k of kill ) {
+      this.destroyCell(k);
+    }
+
+    for(let s of spawn ) {
+      this.addCell(s);
+    }
   }
 
   addCell(tile: Vec2): Entity {

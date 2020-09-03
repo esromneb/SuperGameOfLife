@@ -67,7 +67,14 @@ class WorldParent extends Scene {
 
     this.cell.addCell([0,0]);
     this.cell.addCell([1,1]);
+    this.cell.addCell([1,0]);
     this.cell.addCell([2,2]);
+
+    this.cell.addCell([5,4]);
+    this.cell.addCell([5,5]);
+    this.cell.addCell([5,6]);
+    this.cell.addCell([4,5]);
+    this.cell.addCell([6,5]);
 
   }
 
