@@ -21,9 +21,9 @@ import * as Pixi from 'pixi.js';
 
 class SpriteSystem extends ApeECS.System {
 
-  spriteQuery: Query;
+  newSpritesQ: Query;
   posQuery: Query;
-  graphicsSpriteQuery: Query;
+  newGraphicsQ: Query;
   game: any;
   wp: WorldParent;
 
@@ -35,7 +35,7 @@ class SpriteSystem extends ApeECS.System {
   init() {
 
     // @ts-ignore
-    this.spriteQuery = this.createQuery()
+    this.newSpritesQ = this.createQuery()
       .fromAll('Sprite', 'New')
       .persist();
 
@@ -46,7 +46,7 @@ class SpriteSystem extends ApeECS.System {
       .persist();
 
     // @ts-ignore
-    this.graphicsSpriteQuery = this.createQuery()
+    this.newGraphicsQ = this.createQuery()
       .fromAll('GraphicsSprite', 'New')
       .persist();
 
@@ -59,12 +59,12 @@ class SpriteSystem extends ApeECS.System {
   }
 
   updateSprites(tick) {
-    const sentities = this.spriteQuery.execute();
+    const sentities = this.newSpritesQ.execute();
     for (const entity of sentities) {
       for (const sprite of entity.getComponents('Sprite')) {
 
         sprite.sprite = Pixi.Sprite.from(sprite.frame);
-        sprite.sprite.anchor.set(.5);
+        sprite.sprite.anchor.set(0,1);
         sprite.sprite.scale.set(sprite.scale);
         sprite.sprite.tint = sprite.color;
         if (!sprite.container) {
@@ -93,7 +93,7 @@ class SpriteSystem extends ApeECS.System {
     const gboard = this.world.getEntity('gboard');
     const sz = gboard.c.board.gsize;
 
-    const q = this.graphicsSpriteQuery.execute();
+    const q = this.newGraphicsQ.execute();
     for (const entity of q) {
       for (const sprite of entity.getComponents('GraphicsSprite')) {
         sprite.sprite = new Pixi.Graphics();

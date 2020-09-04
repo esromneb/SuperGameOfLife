@@ -109,24 +109,26 @@ class WorldParent extends Scene {
     const game = this.gamec;
     let x = 40;
 
-    const entity = this.world.createEntity({
-        tags: ['New', 'Station'],
-        components: [
-          {
-            type: 'Sprite',
-            frame: 'x',
-            container: game.layers.main,
-            scale: 3,
-            color: 0xffffff
-          },
-          {
-            type: 'Position',
-            x,
-            y: game.height - 20,
-            angle: -Math.PI / 2
-          }
-        ]
-      });
+    if( false ) {
+      const entity = this.world.createEntity({
+          tags: ['New', 'Station'],
+          components: [
+            {
+              type: 'Sprite',
+              frame: 'pearl_01d',
+              container: game.layers.main,
+              scale: 3,
+              color: 0xffffff
+            },
+            {
+              type: 'Position',
+              x,
+              y: game.height - 20,
+              angle: -Math.PI / 2
+            }
+          ]
+        });
+    }
   }
 
   setupSystems(): void {

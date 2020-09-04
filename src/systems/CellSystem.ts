@@ -136,12 +136,11 @@ class CellSystem extends ApeECS.System {
         tags: ['New'],
         components: [
           {
-            type: 'GraphicsSprite',
+            type: 'Sprite',
             key: 's0',
-            frame: 'x',
+            frame: 'pearl_01d',
             container: game.layers.main,
-            scale: 1,
-            color: 0xff0000
+            scale: 0.8,
           },
           {
             type: 'Position',

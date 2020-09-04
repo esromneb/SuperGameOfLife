@@ -19,6 +19,7 @@ const load = async () => {
   return new Promise((resolve, reject) => {
 
     loader.add('x', 'assets/x.png');
+    loader.add('ss', 'assets/spritesheet.json');
 
     loader.load((loader, resources) => {
       resolve(loader);
