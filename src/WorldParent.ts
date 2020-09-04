@@ -46,6 +46,7 @@ class WorldParent extends Scene {
       cleanupPools: false,
     });
 
+
     this.registerComponents();
     this.registerTags();
     this.setupFirstEntities();
@@ -66,6 +67,7 @@ class WorldParent extends Scene {
     this.eboard = this.board.initBoard(12,8);
     this.sprite.drawBoundaries();
     this.input.drawButtons();
+    this.cell.finalInit();
 
 
     this.cell.spawnCell([0,0]);

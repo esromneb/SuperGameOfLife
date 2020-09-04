@@ -31,12 +31,19 @@ class CellSystem extends ApeECS.System {
 
   wp: WorldParent;
 
+  spriteSize: number = 0.7;
+
   constructor(world, worldParent) {
     super(world);
     this.wp = worldParent;
   }
 
   init() {
+
+  }
+
+  finalInit() {
+    this.spriteSize = this.getSpriteScale();
 
   }
 
@@ -119,6 +126,27 @@ class CellSystem extends ApeECS.System {
     }
   }
 
+  getSpriteScale(): number {
+    const e = this.world.getEntity('gboard');
+    const offset = e.c.board.tileOffset;
+    const sz = e.c.board.gsize;
+
+    const minsz = Math.min(sz[0], sz[1]);
+
+    // console.log(minsz);
+
+    const startSize = 40;
+    const startScale = 0.8;
+
+    const ret = (minsz/startSize) * startScale;
+
+
+    // this scale was calculated when the board was 40x40
+
+
+    return ret;
+  }
+
   // returns the new entity if spawned
   // returns the existing one if something already exists here
   spawnCell(tile: Vec2): Entity {
@@ -140,7 +168,7 @@ class CellSystem extends ApeECS.System {
             key: 's0',
             frame: 'pearl_01d',
             container: game.layers.main,
-            scale: 0.8,
+            scale: this.spriteSize,
           },
           {
             type: 'Position',
