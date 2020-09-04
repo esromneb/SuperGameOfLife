@@ -121,3 +121,15 @@ static properties = {
     moved: true,
   };
 };
+
+
+export class GMouseState extends Component {
+static properties = {
+  leftWasDown: false,
+  leftDragStart: [0,0],
+  rightWasDown: false,    // Not used
+  rightDragStart: [0,0],  // Not used
+  middleWasDown: false,   // Not used
+  middleDragStart: [0,0], // Not used
+  };
+};

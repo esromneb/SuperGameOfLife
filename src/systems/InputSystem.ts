@@ -37,6 +37,19 @@ class InputSystem extends ApeECS.System {
     this.wp = worldParent;
   }
 
+  matrix: any = {
+    normal: {
+      left: {
+        up:   this.leftMouseUpNormal.bind(this),
+        down: this.leftMouseDownNormal.bind(this),
+        drag: null,
+      },
+      hover: this.updateMouseHoverTextNormal.bind(this),
+      enter: null,
+      exit:  null,
+    },
+  }
+
   init() {
     this.game = this.world.getEntity('gentity').c.game;
   }
@@ -51,20 +64,59 @@ class InputSystem extends ApeECS.System {
     const xypos: VecXY = this.wp.game.renderer.plugins.interaction.mouse.global;
     const pos: Vec2 = [xypos.x, xypos.y]; // fresh
 
+    this.updateMousePosition(pos);
+    this.updateMouseButtons(pos);
+  }
+  private updateMousePosition(pos: Vec2) {
+    // input pos is fresh value
+
     // previous (pos/moved) gets set to now
     this.wp.mouse.c.prev.pos = this.wp.mouse.c.now.pos;
     this.wp.mouse.c.prev.moved = this.wp.mouse.c.now.moved;
 
     // we compare fresh to now
-    const moved = pos[0] != this.wp.mouse.c.now.pos[0] || pos[1] != this.wp.mouse.c.now.pos[1];
+    const moved = (pos[0] != this.wp.mouse.c.now.pos[0]) || (pos[1] != this.wp.mouse.c.now.pos[1]);
 
     // now gets set to fresh values
     this.wp.mouse.c.now.pos = pos;
     this.wp.mouse.c.now.moved = moved;
 
-    // if( this.wp.mouse.c.now.moved ) {
-    //   console.log(pos);
-    // }
+    if( this.wp.mouse.c.now.moved ) {
+      console.log(this.wp.game.renderer.plugins.interaction.mouse.buttons);
+      // console.log(pos);
+    }
+  }
+
+  private updateMouseButtons(pos: Vec2) {
+    const buttons = this.wp.game.renderer.plugins.interaction.mouse.buttons;
+    const state = this.wp.mouse.c.state;
+
+    const left = buttons & 0x1;
+    if( state.leftWasDown && !left ) {
+      state.leftWasDown = false;
+      this.handleMouseUpDown('left', false, pos);
+    } else if( !state.leftWasDown && left ) {
+      state.leftWasDown = true;
+      state.leftDragStart = pos;
+      this.handleMouseUpDown('left', true, pos);
+    }
+
+    if( state.leftWasDown ) {
+      this.hanldeMouseDrag('left', pos, state.leftDragStart);
+    }
+  }
+
+
+  private handleMouseUpDown(button: string, down: boolean, pos: Vec2) {
+    if( down ) {
+      console.log("down");
+    } else {
+      console.log("up");
+
+    }
+  }
+  private hanldeMouseDrag(button: string, pos: Vec2, start: Vec2) {
+
   }
 
 
@@ -102,7 +154,7 @@ class InputSystem extends ApeECS.System {
 
     let onButtonUp = (x) => {
       this.wp.cell.calculateLife();
-      console.log(x);
+      console.log(x.data.originalEvent.which);
     }
 
     let onButtonOver = (x) => {
@@ -206,10 +258,18 @@ class InputSystem extends ApeECS.System {
     this.wp.addChild(text);
 
     text.position.set(ox,oy);
-
-
-
   }
+
+
+  private leftMouseUpNormal(m: Vec2): void {
+  }
+  private leftMouseDownNormal(m: Vec2): void {
+  }
+  private updateMouseHoverTextNormal(v: Vec2): void {
+  }
+
+
+
 }
 
 export {

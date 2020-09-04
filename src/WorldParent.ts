@@ -119,6 +119,10 @@ class WorldParent extends Scene {
         {
           type: 'GMouse',
           key: 'prev',
+        },
+        {
+          type: 'GMouseState',
+          key: 'state',
         }
       ]
     });
