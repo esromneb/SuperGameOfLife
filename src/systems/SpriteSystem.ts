@@ -151,10 +151,7 @@ class SpriteSystem extends ApeECS.System {
         sprite.sprite.beginFill(sprite.color).lineStyle(0,0x000000);
 
         // -1 is because the grid occupies a single pixel
-        // sprite.sprite.drawRect(0,0, sz[0]-1, -39);
-        // drawRect really seems backwards, seems like x and y are switched
-        // just fudged this till it worked
-        sprite.sprite.drawRect(0,0, (sz[1]-1) , -(sz[0]-1));
+        sprite.sprite.drawRect(0,0, sz[0]-1, sz[1]-1);
 
         // sprite.sprite.lineStyle(2, 0xffffff)
         //    .moveTo(0, 0)

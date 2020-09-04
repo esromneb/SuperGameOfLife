@@ -226,3 +226,30 @@ class CellSystem extends ApeECS.System {
 export {
 CellSystem,
 }
+
+
+/*
+// create cell squares not sprites
+
+    const s = this.world.createEntity({
+        tags: ['New'],
+        components: [
+          {
+            type: 'GraphicsSprite',
+            key: 's0',
+            // frame: 'pearl_01d',
+            container: game.layers.main,
+            scale: this.spriteSize,
+            color: 0xff0000,
+          },
+          {
+            type: 'Position',
+            x,
+            y,
+            angle: 0,
+          }
+        ]
+      });
+
+
+*/
