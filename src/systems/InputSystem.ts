@@ -42,7 +42,7 @@ class InputSystem extends ApeECS.System {
       left: {
         up:   this.leftMouseUpNormal.bind(this),
         down: this.leftMouseDownNormal.bind(this),
-        drag: null,
+        drag: this.leftMouseDragNormal.bind(this),
       },
       hover: this.updateMouseHoverTextNormal.bind(this),
       enter: null,
@@ -102,21 +102,23 @@ class InputSystem extends ApeECS.System {
     }
 
     if( state.leftWasDown ) {
-      this.hanldeMouseDrag('left', pos, state.leftDragStart);
+      this.handleMouseDrag('left', pos, state.leftDragStart);
     }
   }
 
 
   private handleMouseUpDown(button: string, down: boolean, pos: Vec2) {
-    if( down ) {
-      console.log("down");
-    } else {
-      console.log("up");
-
+    const row = this.matrix[this.wp.gentity.c.ui.mode];
+    const key = down?'down':'up';
+    if(row.left[key]) {
+      row.left[key](pos);
     }
   }
-  private hanldeMouseDrag(button: string, pos: Vec2, start: Vec2) {
-
+  private handleMouseDrag(button: string, pos: Vec2, start: Vec2) {
+    const row = this.matrix[this.wp.gentity.c.ui.mode];
+    if(row.left.drag) {
+      row.left.drag(pos, start);
+    }
   }
 
 
@@ -260,12 +262,18 @@ class InputSystem extends ApeECS.System {
     text.position.set(ox,oy);
   }
 
+  private leftMouseDragNormal(m: Vec2, start: Vec2): void {
+    console.log(`drag from [${start[0]},${start[1]}]  to  [${m[0]},${m[1]}]`);
+  }
 
   private leftMouseUpNormal(m: Vec2): void {
+    console.log('leftMouseUpNormal');
   }
   private leftMouseDownNormal(m: Vec2): void {
+    console.log('leftMouseDownNormal');
   }
   private updateMouseHoverTextNormal(v: Vec2): void {
+
   }
 
 

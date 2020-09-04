@@ -36,6 +36,7 @@ class WorldParent extends Scene {
 
   eboard: Entity;
 
+  gentity: Entity;
   gamec: Component;
   mouse: Entity;
 
@@ -107,6 +108,7 @@ class WorldParent extends Scene {
         }
       ]
     });
+    this.gentity = gentity;
     this.gamec = gentity.c.game;
 
     this.mouse = this.world.createEntity({
