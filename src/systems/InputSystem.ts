@@ -185,7 +185,10 @@ class InputSystem extends ApeECS.System {
         .on('mouseout', onButtonOut)
 
 
-    let text = new Pixi.Text('Step',{fontFamily : 'Arial', fontSize: 14, fill : 0xffffff, align : 'center'});
+    let text = new Pixi.Text(
+      'Step',
+      {fontFamily : 'Arial', fontSize: 14, fill : 0xffffff, align : 'center'}
+      );
     this.wp.addChild(text);
 
     text.position.set(ox,oy);
@@ -193,6 +196,39 @@ class InputSystem extends ApeECS.System {
 
 
     this.drawButton2();
+    this.hoverText = this.drawTextEntity();
+  }
+
+  hoverText: Entity;
+
+  drawTextEntity(): Entity {
+    const game = this.wp.gamec;
+
+    const text = 'place holder';
+
+    const s = this.world.createEntity({
+        tags: ['New'],
+        components: [
+          {
+            type: 'TextSprite',
+            key: 's0',
+            style: {fontFamily : 'Arial', fontSize: 14, fill : 0xffffff, align : 'center'},
+            container: game.layers.main,
+            text,
+          },
+          {
+            type: 'Position',
+            x: 600,
+            y: 600,
+          }
+        ]
+      });
+
+    return s;
+  }
+
+  setHoverText(t: string): void {
+    this.hoverText.c.s0.text = t;
   }
 
 

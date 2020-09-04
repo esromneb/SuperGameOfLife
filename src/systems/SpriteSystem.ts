@@ -24,6 +24,7 @@ class SpriteSystem extends ApeECS.System {
   newSpritesQ: Query;
   posQuery: Query;
   newGraphicsQ: Query;
+  newTextQ: Query;
   game: any;
   wp: WorldParent;
 
@@ -50,21 +51,48 @@ class SpriteSystem extends ApeECS.System {
       .fromAll('GraphicsSprite', 'New')
       .persist();
 
+    // @ts-ignore
+    this.newTextQ = this.createQuery()
+      .fromAll('TextSprite', 'New')
+      .persist();
+
     this.game = this.world.getEntity('gentity').c.game;
   }
 
   update(tick) {
-    this.updateGraphicSprites(tick);
-    this.updateSprites(tick);
+    this.spawnText(tick);
+    this.spawnGraphicSprites(tick);
+    this.spawnSprites(tick);
+    this.updatePositions(tick);
   }
 
-  updateSprites(tick) {
+  private spawnText(tick) {
+    const q = this.newTextQ.execute();
+    for (const e of q) {
+      for (const sprite of e.getComponents('TextSprite')) {
+
+        sprite.sprite = new Pixi.Text(sprite.text, sprite.style);
+        // sprite.sprite.anchor.set(0,1);
+        // sprite.sprite.scale.set(sprite.scale);
+        // sprite.sprite.tint = sprite.color;
+        if (!sprite.container) {
+          sprite.container = this.game.layers[sprite.layer];
+        }
+        if (sprite.container)
+          sprite.container.addChild(sprite.sprite);
+      }
+      e.removeTag('New');
+      console.log('New Text Sprite');
+    }
+  }
+
+  private spawnSprites(tick) {
     const sentities = this.newSpritesQ.execute();
     for (const entity of sentities) {
       for (const sprite of entity.getComponents('Sprite')) {
 
         sprite.sprite = Pixi.Sprite.from(sprite.frame);
-        sprite.sprite.anchor.set(0,1);
+        sprite.sprite.anchor.set(0,0);
         sprite.sprite.scale.set(sprite.scale);
         sprite.sprite.tint = sprite.color;
         if (!sprite.container) {
@@ -76,19 +104,24 @@ class SpriteSystem extends ApeECS.System {
       entity.removeTag('New');
       // console.log('New Sprite');
     }
+  }
 
+  private updatePositions(tick) {
     const q = this.posQuery.execute();
     for (const e of q) {
       for (const pos of e.getComponents('Position')) {
-        for (const sprite of [...e.getComponents('Sprite'), ...e.getComponents('GraphicsSprite')]) {
+        for (const sprite of [...e.getComponents('Sprite'), ...e.getComponents('GraphicsSprite'), ...e.getComponents('TextSprite')]) {
           sprite.sprite.position.set(pos.x, pos.y);
-          sprite.sprite.rotation = pos.angle + Math.PI / 2;
+          // sprite.sprite.rotation = pos.angle + Math.PI / 2;
+          if( sprite.type === "TextSprite" ) {
+            sprite.sprite.text = sprite.text;
+          }
         }
       }
     }
   }
 
-  updateGraphicSprites(tick) {
+  private spawnGraphicSprites(tick) {
     // grab the gboard entity 
     const gboard = this.world.getEntity('gboard');
     const sz = gboard.c.board.gsize;

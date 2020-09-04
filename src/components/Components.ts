@@ -67,6 +67,31 @@ export class Sprite extends Component {
 
 };
 
+export class TextSprite extends Component {
+
+  static properties = {
+    text: '',
+    layer: '',
+    style: {},
+    sprite: null,
+    container: null,
+  }
+
+  init() {
+
+  }
+
+  preDestroy() {
+
+    if (this.sprite) {
+      this.sprite.destroy();
+    }
+    this.container = null;
+    this.sprite = null;
+  }
+
+};
+
 
 export class Tile extends Component {
   static properties = {
