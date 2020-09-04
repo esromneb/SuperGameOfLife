@@ -114,3 +114,10 @@ export class Cell extends Component {
     sprite: EntityRef,
   }
 }
+
+export class GMouse extends Component {
+static properties = {
+    pos: [0,0],
+    moved: true,
+  };
+};

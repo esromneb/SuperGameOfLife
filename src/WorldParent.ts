@@ -37,6 +37,7 @@ class WorldParent extends Scene {
   eboard: Entity;
 
   gamec: Component;
+  mouse: Entity;
 
   constructor(game: any, public options: any = {}) {
     super(game);
@@ -59,7 +60,11 @@ class WorldParent extends Scene {
 
   update(dt, df, time): void {
     // console.log("World Parent Update", dt);
+  
+    this.input.updateMouse();
+
     this.world.runSystems('sprite');
+    this.world.tick();
   }
 
 
@@ -103,6 +108,20 @@ class WorldParent extends Scene {
       ]
     });
     this.gamec = gentity.c.game;
+
+    this.mouse = this.world.createEntity({
+      id: 'gmouse',
+      components: [
+        {
+          type: 'GMouse',
+          key: 'now',
+        },
+        {
+          type: 'GMouse',
+          key: 'prev',
+        }
+      ]
+    });
 
 
   }

@@ -74,7 +74,7 @@ class SpriteSystem extends ApeECS.System {
           sprite.container.addChild(sprite.sprite);
       }
       entity.removeTag('New');
-      console.log('New Sprite');
+      // console.log('New Sprite');
     }
 
     const q = this.posQuery.execute();
