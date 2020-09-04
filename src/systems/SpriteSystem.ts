@@ -112,7 +112,7 @@ class SpriteSystem extends ApeECS.System {
       for (const pos of e.getComponents('Position')) {
         for (const sprite of [...e.getComponents('Sprite'), ...e.getComponents('GraphicsSprite'), ...e.getComponents('TextSprite')]) {
           sprite.sprite.position.set(pos.x, pos.y);
-          // sprite.sprite.rotation = pos.angle + Math.PI / 2;
+          sprite.sprite.rotation = pos.angle;// + Math.PI / 2;
           if( sprite.type === "TextSprite" ) {
             sprite.sprite.text = sprite.text;
           }
