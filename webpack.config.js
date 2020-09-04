@@ -32,7 +32,7 @@ module.exports = {
   },
   plugins: [
     new CopyPlugin([
-      { from: './html/*.html', to: '', flatten: false },
+      { from: './html/*.html', to: '', flatten: true },
       { from: './assets/*', to: '', flatten: false },
     ]),
   ],
