@@ -1,6 +1,11 @@
 import {WorldParent} from '../WorldParent'
 
 import {
+Vec2,
+VecXY
+} from '../Types'
+
+import {
   System,
   World,
   Component,
@@ -19,10 +24,9 @@ const ApeECS = {
 
 import * as Pixi from 'pixi.js';
 
-import {
-Vec2,
-VecXY
-} from '../Types'
+const textStyle = {fontFamily : 'Arial', fontSize: 14, fill : 0xffffff, align : 'center'};
+
+
 
 class InputSystem extends ApeECS.System {
 
@@ -31,6 +35,8 @@ class InputSystem extends ApeECS.System {
   // graphicsSpriteQuery: Query;
   game: any;
   wp: WorldParent;
+
+  buttonQ: Query;
 
   constructor(world, worldParent) {
     super(world);
@@ -52,9 +58,20 @@ class InputSystem extends ApeECS.System {
 
   init() {
     this.game = this.world.getEntity('gentity').c.game;
+
+    // @ts-ignore
+    this.buttonQ = this.createQuery()
+      .fromAll('ButtonPress')
+      .persist();
   }
 
   update(tick) {
+    const q = this.buttonQ.execute();
+    for(const e of q) {
+      // console.log('aaaaaaaaaaaaa');
+      console.log(e);
+      this.world.removeEntity(e);
+    }
     // this.updateGraphicSprites(tick);
     // this.updateSprites(tick);
   }
@@ -121,6 +138,8 @@ class InputSystem extends ApeECS.System {
     }
   }
 
+  buttons: any[] = [];
+
 
   // border: any;
   cells: any;
@@ -156,7 +175,7 @@ class InputSystem extends ApeECS.System {
 
     let onButtonUp = (x) => {
       this.wp.cell.calculateLife();
-      console.log(x.data.originalEvent.which);
+      // console.log(x.data.originalEvent.which);
     }
 
     let onButtonOver = (x) => {
@@ -196,43 +215,72 @@ class InputSystem extends ApeECS.System {
 
 
     this.drawButton2();
-    this.hoverText = this.drawTextEntity();
+    this.drawAButton(0, [700,400], [40,40]);
+    this.hoverText = this.wp.sprite.addText('plce', [600,600], textStyle);
   }
 
   hoverText: Entity;
 
-  drawTextEntity(): Entity {
-    const game = this.wp.gamec;
 
-    const text = 'place holder';
-
+  buttonWasPressed(number: number): void {
+    console.log("Button " + number + " press on frame " + this.wp.world.currentTick);
     const s = this.world.createEntity({
-        tags: ['New'],
-        components: [
-          {
-            type: 'TextSprite',
-            key: 's0',
-            style: {fontFamily : 'Arial', fontSize: 14, fill : 0xffffff, align : 'center'},
-            container: game.layers.main,
-            text,
-          },
-          {
-            type: 'Position',
-            x: 600,
-            y: 600,
-          }
-        ]
-      });
-
-    return s;
+      components: [
+        {
+          type: 'ButtonPress',
+          number,
+        },
+      ]
+    });
   }
 
   setHoverText(t: string): void {
     this.hoverText.c.s0.text = t;
   }
 
+  drawAButton(n: number, pos: Vec2, size: Vec2): any {
+    let ret: any = {};
+    let button = new Pixi.Graphics();
+    // this.border = button;
 
-  drawButton2() {
+    this.wp.addChild(button);
+
+    // const {width,height} = this.wp.gamec;
+
+    let [ox,oy] = pos;
+
+    let [width, height] = size;
+
+
+    // Move it to the top left
+    button.position.set(ox, oy);
+
+    button.beginFill(0x444444);
+
+    button.drawRect(0,0, width, height );
+
+
+    button.buttonMode = true;
+    button.interactive = true;
+
+    let onButtonUp = (x) => {
+      console.log(x);
+    }
+
+
+    button
+      .on('mouseup',  this.buttonWasPressed.bind(this, n))
+      .on('touchend', this.buttonWasPressed.bind(this, n));
+
+
+    let text = new Pixi.Text('Step',{fontFamily : 'Arial', fontSize: 14, fill : 0xffffff, align : 'center'});
+    this.wp.addChild(text);
+
+    text.position.set(ox,oy);
+  }
+
+
+  drawButton2(): any {
     let button = new Pixi.Graphics();
     // this.border = button;
 

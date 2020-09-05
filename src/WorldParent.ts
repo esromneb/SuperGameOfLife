@@ -63,6 +63,7 @@ class WorldParent extends Scene {
     // console.log("World Parent Update", dt);
   
     this.input.updateMouse();
+    this.world.runSystems('input');
 
     this.world.runSystems('sprite');
     this.world.tick();

@@ -1,6 +1,12 @@
 import {WorldParent} from '../WorldParent'
 
 import {
+Vec2,
+VecXY
+} from '../Types'
+
+
+import {
   System,
   World,
   Component,
@@ -76,7 +82,7 @@ class SpriteSystem extends ApeECS.System {
         // sprite.sprite.scale.set(sprite.scale);
         // sprite.sprite.tint = sprite.color;
         if (!sprite.container) {
-          sprite.container = this.game.layers[sprite.layer];
+          sprite.container = this.game.layers.main;
         }
         if (sprite.container)
           sprite.container.addChild(sprite.sprite);
@@ -239,10 +245,30 @@ class SpriteSystem extends ApeECS.System {
     }
 
     // console.log(tilex + ' ' + tiley)
-
-
-    
   }
+
+  // This is a fixture to create a pixi text box
+  // this returns a normally formatted entity which will cause the graphics
+  // system to draw a pixy textbos
+  addText(text: string, pos: Vec2, style: any): Entity {
+    return this.world.createEntity({
+      tags: ['New'],
+      components: [
+        {
+          type: 'TextSprite',
+          key: 's0',
+          style,
+          text,
+        },
+        {
+          type: 'Position',
+          x: pos[0],
+          y: pos[1],
+        }
+      ]
+    });
+  }
+
 }
 
 export {
