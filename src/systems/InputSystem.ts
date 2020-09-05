@@ -25,7 +25,7 @@ const ApeECS = {
 import * as Pixi from 'pixi.js';
 
 const textStyle = {fontFamily : 'Arial', fontSize: 14, fill : 0xffffff, align : 'center'};
-
+const buttonTextStyle = textStyle;
 
 
 class InputSystem extends ApeECS.System {
@@ -99,7 +99,7 @@ class InputSystem extends ApeECS.System {
     this.wp.mouse.c.now.moved = moved;
 
     if( this.wp.mouse.c.now.moved ) {
-      console.log(this.wp.game.renderer.plugins.interaction.mouse.buttons);
+      // console.log(this.wp.game.renderer.plugins.interaction.mouse.buttons);
       // console.log(pos);
     }
   }
@@ -215,7 +215,7 @@ class InputSystem extends ApeECS.System {
 
 
     this.drawButton2();
-    this.drawAButton(0, [700,400], [40,40]);
+    this.buttons[0] = this.addButton(0, [700,400], [40,40]);
     this.hoverText = this.wp.sprite.addText('plce', [600,600], textStyle);
   }
 
@@ -238,7 +238,7 @@ class InputSystem extends ApeECS.System {
     this.hoverText.c.s0.text = t;
   }
 
-  drawAButton(n: number, pos: Vec2, size: Vec2): any {
+  addButton(n: number, pos: Vec2, size: Vec2): any {
     let ret: any = {};
     let button = new Pixi.Graphics();
     // this.border = button;
@@ -273,10 +273,13 @@ class InputSystem extends ApeECS.System {
       .on('touchend', this.buttonWasPressed.bind(this, n));
 
 
-    let text = new Pixi.Text('Step',{fontFamily : 'Arial', fontSize: 14, fill : 0xffffff, align : 'center'});
-    this.wp.addChild(text);
+    ret.button = button;
+    ret.text = this.wp.sprite.addText('but 0', pos, buttonTextStyle);
+    // let text = new Pixi.Text('Step',{fontFamily : 'Arial', fontSize: 14, fill : 0xffffff, align : 'center'});
+    // this.wp.addChild(text);
 
-    text.position.set(ox,oy);
+    // text.position.set(ox,oy);
+    return ret;
   }
 
 
