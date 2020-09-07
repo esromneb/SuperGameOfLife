@@ -39,9 +39,9 @@ class InputSystem extends ApeECS.System {
   buttonQ: Query;
 
   constructor(world, worldParent) {
-    this.wp = worldParent;
     super(world);
-    this.changeUIMode('normal');
+    this.wp = worldParent;
+
   }
 
   matrix: any = {
@@ -49,7 +49,7 @@ class InputSystem extends ApeECS.System {
       left: {
         up:   this.leftMouseUpNormal.bind(this),
         down: this.leftMouseDownNormal.bind(this),
-        drag: this.leftMouseDragNormal.bind(this),
+        drag: null,//this.leftMouseDragNormal.bind(this),
       },
       hover: this.updateMouseHoverTextNormal.bind(this),
       enter: this.enterNormalMode.bind(this),
@@ -66,23 +66,48 @@ class InputSystem extends ApeECS.System {
       enter: this.enterDropMode.bind(this),
       exit:  null,
       buttons: null,
+    },
+    mutate: {
+      left: {
+        up:   null,
+        down: this.leftMouseUpMutate.bind(this),
+        drag: null,
+      },
+      hover: this.mutateHover.bind(this),
+      enter: this.enterMutateMode.bind(this),
+      exit:  null,
+      buttons: this.handleMutateButton.bind(this),
     }
   }
 
   init() {
     this.game = this.world.getEntity('gentity').c.game;
 
+    // do not call .persist()
+    // see comment below
     // @ts-ignore
     this.buttonQ = this.createQuery()
-      .fromAll('ButtonPress')
-      .persist();
+      .fromAll('ButtonPress');
 
 
   }
 
   update(tick) {
     const mode = this.wp.gentity.c.ui.mode;
-    const q = this.buttonQ.execute();
+
+    // ButtonPress gets created in the callback which is bound to pixi/the browser
+    // because of this, We assume that the ButtonPress gets created after
+    // WorldParent.tick()
+    // Here we would like to react to this as fast as possible
+    // If we were to used a persisted query, it would only be updated at tick()
+    // so instead we call .refresh().execute() every time.
+    // we could also use `world.updateIndexes().` but this adds extra overhead
+
+    const q = this.buttonQ.refresh().execute();
+    // const q = this
+    // .createQuery()
+    // .fromAll('ButtonPress')
+    // .execute();
     for(const e of q) {
       // console.log('aaaaaaaaaaaaa');
       console.log("this button clicked in mode " + mode);
@@ -160,8 +185,14 @@ class InputSystem extends ApeECS.System {
     this.wp.mouse.c.now.moved = moved;
 
     if( this.wp.mouse.c.now.moved ) {
+
+      const mode = this.wp.gentity.c.ui.mode;
       // console.log(this.wp.game.renderer.plugins.interaction.mouse.buttons);
       // console.log(pos);
+      const row = this.matrix[mode];
+      if(row.hover) {
+        row.hover(this.wp.mouse.c.now.pos);
+      }
     }
   }
 
@@ -204,6 +235,11 @@ class InputSystem extends ApeECS.System {
 
   // border: any;
   cells: any;
+
+  finalInit(): void {
+    this.drawButtons();
+    this.changeUIMode('normal');
+  }
 
   drawButtons() {
     let button = new Pixi.Graphics();
@@ -276,10 +312,22 @@ class InputSystem extends ApeECS.System {
 
 
     this.drawButton2();
-    this.buttons[0] = this.addButton(0, [700,400], [40,40]);
-    this.buttons[1] = this.addButton(1, [780,400], [40,40]);
+    this.buttons[0] = this.addButton(0, [700,400], [60,40]);
+    this.buttons[1] = this.addButton(1, [780,400], [60,40]);
+    this.buttons[2] = this.addButton(2, [860,400], [60,40]);
+
+    // console.log(this.buttons[2].text.c.position);
+    // this.buttons[2].text.c.position.x = 60;
 
     this.hoverText = this.wp.sprite.addText('plce', [600,600], textStyle);
+  }
+
+  setButtonText(n: number, t: string): void {
+    if( n >= this.buttons.length ) {
+      throw new Error(`setButtonText: ${n} is larger than the number of buttons (${this.buttons.length})`);
+    }
+
+    this.buttons[n].text.c.s0.text = t;
   }
 
   hoverText: Entity;
@@ -424,20 +472,83 @@ class InputSystem extends ApeECS.System {
     console.log('leftMouseDownNormal');
   }
   private updateMouseHoverTextNormal(v: Vec2): void {
-
+    // console.log(v);
+    this.hoverText.c.position.x = v[0]+10;
+    this.hoverText.c.position.y = v[1]+10;
+    // this.text.position.set(...this.wp.mouse.c.now);
   }
 
   private enterNormalMode(): void {
     console.log("entering normal mode");
+    this.setHoverText('normal');
+    this.setButtonText(0, 'Step');
+    this.setButtonText(1, 'Add');
+    this.setButtonText(2, 'Mutate');
   }
 
   private enterDropMode(): void {
-    console.log("entering normal mode");
+    console.log("entering enterDropMode mode");
+    this.setHoverText('drop');
   }
 
   private handleNormalButton(n: number): void {
-    console.log("handle normal button " + n);
+    console.log("handle normal button " + n + " on frame " + this.world.currentTick);
+    switch(n) {
+      case 0:
+        this.world.createEntity({components: [{type: 'StepSimulation'}]});
+        break;
+      case 1:
+        this.changeUIMode('drop');
+        break;
+      case 2:
+        this.changeUIMode('mutate');
+        break;
+      default:
+        console.log(`Unhandled ${n} in handleNormalButton()`);
+        break;
+    }
   }
+
+  private enterMutateMode(): void {
+    this.setButtonText(0, 'Exit Mode');
+    this.setButtonText(1, 'Exit Mode');
+    this.setButtonText(2, 'Mutate');
+  }
+
+  private handleMutateButton(n: number): void {
+    console.log("handle normal button " + n + " on frame " + this.world.currentTick);
+    switch(n) {
+      case 0:
+      case 1:
+        this.changeUIMode('normal');
+        break;
+      case 2:
+        break;
+      default:
+        console.log(`Unhandled ${n} in handleNormalButton()`);
+        break;
+    }
+  }
+
+  private leftMouseUpMutate(m: Vec2): void {
+    console.log('leftMouseUpMutate');
+  }
+
+  private mutateHover(v: Vec2): void {
+    // console.log(v);
+    this.hoverText.c.position.x = v[0]+10;
+    this.hoverText.c.position.y = v[1]+10;
+
+    this.setHoverText(`Mutate: ${v[0]},${v[1]}`);
+
+    // this.text.position.set(...this.wp.mouse.c.now);
+  }
+
+  // ecs.createEntity({
+  //     c: {
+  //       Health: { hp: 10 }
+  //     }
+  //   });
 
 
 

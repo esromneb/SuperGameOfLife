@@ -137,6 +137,7 @@ export class Cell extends Component {
   static properties = {
     tickAdded: 0,
     sprite: EntityRef,
+    ctype: 'cell',
   }
 }
 
@@ -162,5 +163,10 @@ export class GMouseState extends Component {
 export class ButtonPress extends Component {
 static properties = {
     number: 0,
+  };
+};
+
+export class StepSimulation extends Component {
+static properties = {
   };
 };

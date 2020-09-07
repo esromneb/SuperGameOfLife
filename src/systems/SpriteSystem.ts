@@ -262,6 +262,7 @@ class SpriteSystem extends ApeECS.System {
         },
         {
           type: 'Position',
+          key: 'position',
           x: pos[0],
           y: pos[1],
         }

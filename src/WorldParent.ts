@@ -64,16 +64,17 @@ class WorldParent extends Scene {
   
     this.input.updateMouse();
     this.world.runSystems('input');
-
-    this.world.runSystems('sprite');
     this.world.tick();
+
+    this.world.runSystems('cell');
+    this.world.runSystems('sprite');
   }
 
 
   finalInit(): void {
     this.eboard = this.board.initBoard(12,8);
     this.sprite.drawBoundaries();
-    this.input.drawButtons();
+    this.input.finalInit();
     this.cell.finalInit();
 
 

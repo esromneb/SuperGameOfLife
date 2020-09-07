@@ -30,6 +30,7 @@ class CellSystem extends ApeECS.System {
   // game: any;
 
   wp: WorldParent;
+  stepQ: Query;
 
   spriteSize: number = 0.7;
 
@@ -40,6 +41,10 @@ class CellSystem extends ApeECS.System {
 
   init() {
 
+    // @ts-ignore
+    this.stepQ = this.createQuery()
+      .fromAll('StepSimulation')
+      .persist();
   }
 
   finalInit() {
@@ -81,6 +86,12 @@ class CellSystem extends ApeECS.System {
   }
 
   update(tick) {
+    const q = this.stepQ.execute();
+    for(const e of q) {
+      console.log("step simulation on frame " + this.world.currentTick);
+      this.calculateLife();
+      e.destroy();
+    }
   }
 
   // Any live cell with fewer than two live neighbours dies, as if by underpopulation.
@@ -172,6 +183,7 @@ class CellSystem extends ApeECS.System {
           },
           {
             type: 'Position',
+            key: 'position',
             x,
             y,
             angle: 0,
@@ -204,6 +216,7 @@ class CellSystem extends ApeECS.System {
     const e = this.spawnCell(tile);
 
     e.c.cell.sprite.c.s0.color = 0xD4F1F9;
+    e.c.cell.ctype = 'ice';
 
     return e;
   }
