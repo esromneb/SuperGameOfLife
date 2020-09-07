@@ -109,7 +109,7 @@ export class Position extends Component {
 
 export class UIState extends Component {
   static properties = {
-    mode: 'normal',
+    mode: '__init',
   }
 }
 

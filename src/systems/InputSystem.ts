@@ -39,8 +39,9 @@ class InputSystem extends ApeECS.System {
   buttonQ: Query;
 
   constructor(world, worldParent) {
-    super(world);
     this.wp = worldParent;
+    super(world);
+    this.changeUIMode('normal');
   }
 
   matrix: any = {
@@ -51,9 +52,21 @@ class InputSystem extends ApeECS.System {
         drag: this.leftMouseDragNormal.bind(this),
       },
       hover: this.updateMouseHoverTextNormal.bind(this),
-      enter: null,
+      enter: this.enterNormalMode.bind(this),
       exit:  null,
+      buttons: this.handleNormalButton.bind(this),
     },
+    drop: {
+      left: {
+        up:   this.leftMouseUpNormal.bind(this),
+        down: this.leftMouseDownNormal.bind(this),
+        drag: this.leftMouseDragNormal.bind(this),
+      },
+      hover: this.updateMouseHoverTextNormal.bind(this),
+      enter: this.enterDropMode.bind(this),
+      exit:  null,
+      buttons: null,
+    }
   }
 
   init() {
@@ -63,18 +76,66 @@ class InputSystem extends ApeECS.System {
     this.buttonQ = this.createQuery()
       .fromAll('ButtonPress')
       .persist();
+
+
   }
 
   update(tick) {
+    const mode = this.wp.gentity.c.ui.mode;
     const q = this.buttonQ.execute();
     for(const e of q) {
       // console.log('aaaaaaaaaaaaa');
-      console.log(e);
+      console.log("this button clicked in mode " + mode);
+      // console.log(e);
+      // console.log(e.c.button.number);
+
+      const nrow = this.matrix[mode];
+      if(nrow.buttons) {
+        console.log('found button fn');
+        nrow.buttons(e.c.button.number);
+        // nrow.bu
+        // nrow.buttons
+      }
+
       this.world.removeEntity(e);
     }
     // this.updateGraphicSprites(tick);
     // this.updateSprites(tick);
   }
+
+
+  changeUIMode(m: string): void {
+
+    // asked to change into mode we are already in
+    if( m === this.wp.gentity.c.ui.mode ) {
+      return;
+    }
+
+    const prev = this.wp.gentity.c.ui.mode;
+    let next;
+
+    if( m in this.matrix ) {
+      next = m;
+    } else {
+      next = 'normal';
+    }
+
+    if( prev !== next ) {
+      this.wp.gentity.c.ui.mode = next;
+
+
+      const orow = this.matrix[prev];
+      if(prev !== '__init' && orow.exit) {
+        orow.exit(next);
+      }
+
+      const nrow = this.matrix[next];
+      if(nrow.enter) {
+        nrow.enter(prev);
+      }
+    }
+  }
+
 
 
   updateMouse() {
@@ -216,6 +277,8 @@ class InputSystem extends ApeECS.System {
 
     this.drawButton2();
     this.buttons[0] = this.addButton(0, [700,400], [40,40]);
+    this.buttons[1] = this.addButton(1, [780,400], [40,40]);
+
     this.hoverText = this.wp.sprite.addText('plce', [600,600], textStyle);
   }
 
@@ -228,6 +291,7 @@ class InputSystem extends ApeECS.System {
       components: [
         {
           type: 'ButtonPress',
+          key: 'button',
           number,
         },
       ]
@@ -361,6 +425,18 @@ class InputSystem extends ApeECS.System {
   }
   private updateMouseHoverTextNormal(v: Vec2): void {
 
+  }
+
+  private enterNormalMode(): void {
+    console.log("entering normal mode");
+  }
+
+  private enterDropMode(): void {
+    console.log("entering normal mode");
+  }
+
+  private handleNormalButton(n: number): void {
+    console.log("handle normal button " + n);
   }
 
 
