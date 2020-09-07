@@ -120,7 +120,7 @@ class InputSystem extends ApeECS.System {
 
       const nrow = this.matrix[mode];
       if(nrow.buttons) {
-        console.log('found button fn');
+        // console.log('found button fn');
         nrow.buttons(e.c.button.number);
         // nrow.bu
         // nrow.buttons
@@ -219,6 +219,15 @@ class InputSystem extends ApeECS.System {
     }
   }
 
+  pixelInsideClickBounds(pos: Vec2): boolean {
+    const b = this.clickBounds;
+    const ul = b[0];
+    const br = b[1];
+    if(pos[0] < ul[0] || pos[1] < ul[1] || pos[0] > br[0] || pos[1] > br[1]) {
+      return false;
+    }
+    return true;
+  }
 
   private handleMouseUpDown(button: string, down: boolean, pos: Vec2): void {
     const row = this.matrix[this.wp.gentity.c.ui.mode];
@@ -226,10 +235,7 @@ class InputSystem extends ApeECS.System {
 
     // drop "down" if they are outside the bounds
     if(down) {
-      const b = this.clickBounds;
-      const ul = b[0];
-      const br = b[1];
-      if(pos[0] < ul[0] || pos[1] < ul[1] || pos[0] > br[0] || pos[1] > br[1]) {
+      if(!this.pixelInsideClickBounds(pos)) {
         return;
       }
     }
@@ -563,7 +569,16 @@ class InputSystem extends ApeECS.System {
 
     const tile: Vec2 = this.wp.board.pixelToTile(px);
 
-    this.setHoverText(`Mutate: ${px[0]},${px[1]} : Tile, ${tile[0]},${tile[1]}`);
+    const t0 = `Mutate: ${px[0]},${px[1]}`;
+
+    let t1 = '';
+    if( this.pixelInsideClickBounds(px) ) {
+      t1 = `: Tile, ${tile[0]},${tile[1]}`;
+    }
+
+    const tf = t0 + t1;
+
+    this.setHoverText(tf);
 
   }
 
