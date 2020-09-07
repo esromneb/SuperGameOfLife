@@ -233,6 +233,14 @@ class CellSystem extends ApeECS.System {
     return true;
   }
 
+  mutateCell(tile: Vec2): void {
+    if(this.tileHasCell(tile)) {
+      this.destroyCell(tile);
+    } else {
+      this.spawnCell(tile);
+    }
+  }
+
 
 }
 

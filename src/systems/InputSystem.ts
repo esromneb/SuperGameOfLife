@@ -44,6 +44,10 @@ class InputSystem extends ApeECS.System {
 
   }
 
+  // matrix.x.left will only be called inside these bounds
+
+  clickBounds: [Vec2,Vec2];
+
   matrix: any = {
     normal: {
       left: {
@@ -78,7 +82,7 @@ class InputSystem extends ApeECS.System {
       exit:  null,
       buttons: this.handleMutateButton.bind(this),
     }
-  }
+  };
 
   init() {
     this.game = this.world.getEntity('gentity').c.game;
@@ -216,8 +220,20 @@ class InputSystem extends ApeECS.System {
   }
 
 
-  private handleMouseUpDown(button: string, down: boolean, pos: Vec2) {
+  private handleMouseUpDown(button: string, down: boolean, pos: Vec2): void {
     const row = this.matrix[this.wp.gentity.c.ui.mode];
+
+
+    // drop "down" if they are outside the bounds
+    if(down) {
+      const b = this.clickBounds;
+      const ul = b[0];
+      const br = b[1];
+      if(pos[0] < ul[0] || pos[1] < ul[1] || pos[0] > br[0] || pos[1] > br[1]) {
+        return;
+      }
+    }
+
     const key = down?'down':'up';
     if(row.left[key]) {
       row.left[key](pos);
@@ -239,6 +255,7 @@ class InputSystem extends ApeECS.System {
   finalInit(): void {
     this.drawButtons();
     this.changeUIMode('normal');
+    this.clickBounds = this.wp.board.getClickBounds();
   }
 
   drawButtons() {
@@ -495,7 +512,8 @@ class InputSystem extends ApeECS.System {
     console.log("handle normal button " + n + " on frame " + this.world.currentTick);
     switch(n) {
       case 0:
-        this.world.createEntity({components: [{type: 'StepSimulation'}]});
+        // this.world.createEntity({components: [{type: 'StepSimulation'}]});
+        this.world.createEntity({c:{StepSimulation:{}}});
         break;
       case 1:
         this.changeUIMode('drop');
@@ -510,7 +528,7 @@ class InputSystem extends ApeECS.System {
   }
 
   private enterMutateMode(): void {
-    this.setButtonText(0, 'Exit Mode');
+    this.setButtonText(0, 'Step');
     this.setButtonText(1, 'Exit Mode');
     this.setButtonText(2, 'Mutate');
   }
@@ -519,6 +537,8 @@ class InputSystem extends ApeECS.System {
     console.log("handle normal button " + n + " on frame " + this.world.currentTick);
     switch(n) {
       case 0:
+        this.world.createEntity({c:{StepSimulation:{}}});
+        break;
       case 1:
         this.changeUIMode('normal');
         break;
@@ -530,18 +550,21 @@ class InputSystem extends ApeECS.System {
     }
   }
 
-  private leftMouseUpMutate(m: Vec2): void {
+  private leftMouseUpMutate(px: Vec2): void {
     console.log('leftMouseUpMutate');
+    const tile: Vec2 = this.wp.board.pixelToTile(px);
+
+    this.wp.cell.mutateCell(tile);
   }
 
-  private mutateHover(v: Vec2): void {
-    // console.log(v);
-    this.hoverText.c.position.x = v[0]+10;
-    this.hoverText.c.position.y = v[1]+10;
+  private mutateHover(px: Vec2): void {
+    this.hoverText.c.position.x = px[0]+10;
+    this.hoverText.c.position.y = px[1]+10;
 
-    this.setHoverText(`Mutate: ${v[0]},${v[1]}`);
+    const tile: Vec2 = this.wp.board.pixelToTile(px);
 
-    // this.text.position.set(...this.wp.mouse.c.now);
+    this.setHoverText(`Mutate: ${px[0]},${px[1]} : Tile, ${tile[0]},${tile[1]}`);
+
   }
 
   // ecs.createEntity({
