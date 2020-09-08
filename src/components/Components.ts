@@ -170,3 +170,11 @@ export class StepSimulation extends Component {
 static properties = {
   };
 };
+
+
+export class PotionEffect extends Component {
+static properties = {
+    crowdProtection: 0,
+    aloneProtection: 0,
+  };
+};

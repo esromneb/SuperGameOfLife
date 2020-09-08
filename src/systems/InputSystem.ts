@@ -573,7 +573,11 @@ class InputSystem extends ApeECS.System {
 
     let t1 = '';
     if( this.pixelInsideClickBounds(px) ) {
-      t1 = `: Tile, ${tile[0]},${tile[1]}`;
+
+      let description = this.wp.cell.getDescription(tile);
+
+
+      t1 = `: Tile, ${tile[0]},${tile[1]} ${description}`;
     }
 
     const tf = t0 + t1;

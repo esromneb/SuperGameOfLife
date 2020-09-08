@@ -126,8 +126,6 @@ class CellSystem extends ApeECS.System {
     }
   }
 
-
-
   // Any live cell with fewer than two live neighbours dies, as if by underpopulation.
   // Any live cell with two or three live neighbours lives on to the next generation.
   // Any live cell with more than three live neighbours dies, as if by overpopulation.
@@ -165,6 +163,22 @@ class CellSystem extends ApeECS.System {
     for(let s of spawn ) {
       this.spawnCell(s);
     }
+  }
+
+
+  getDescription(tile: Vec2): string {
+
+    const e = this.cellInTile(tile);
+    
+    if( !!e ) {
+      if( e.c.cell.ctype === 'ice' ) {
+        return 'Ice Block';
+      } else {
+        return 'Cell';
+      }
+
+    }
+    return '';
   }
 
   getSpriteScale(): number {
