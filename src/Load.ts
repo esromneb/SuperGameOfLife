@@ -20,6 +20,7 @@ const load = async () => {
 
     loader.add('x', 'assets/x.png');
     loader.add('ss', 'assets/spritesheet.json');
+    loader.add('ice_01', 'assets/ice_01.png');
 
     loader.load((loader, resources) => {
       resolve(loader);

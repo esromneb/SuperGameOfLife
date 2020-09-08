@@ -49,7 +49,10 @@ class CellSystem extends ApeECS.System {
 
   finalInit() {
     this.spriteSize = this.getSpriteScale();
+  }
 
+  cellInTile(tile: Vec2): Entity | undefined {
+    return this.world.getEntity(`c${tile[0]}_${tile[1]}`);
   }
 
   tileHasCell(tile: Vec2): boolean {
@@ -212,11 +215,21 @@ class CellSystem extends ApeECS.System {
     return e;
   }
 
+  updateCellGraphics(e) {
+    if(e.c.cell.ctype === 'cell') {
+      e.c.cell.sprite.c.s0.frame = 'pearl_01c';
+    } else if( e.c.cell.ctype === 'ice' ) {
+      e.c.cell.sprite.c.s0.frame = 'ice_01';
+    }
+  }
+
   spawnIce(tile: Vec2): Entity {
     const e = this.spawnCell(tile);
 
-    e.c.cell.sprite.c.s0.color = 0xD4F1F9;
+    // e.c.cell.sprite.c.s0.color = 0xD4F1F9;
     e.c.cell.ctype = 'ice';
+
+    this.updateCellGraphics(e);
 
     return e;
   }
@@ -235,7 +248,15 @@ class CellSystem extends ApeECS.System {
 
   mutateCell(tile: Vec2): void {
     if(this.tileHasCell(tile)) {
-      this.destroyCell(tile);
+      const e = this.cellInTile(tile);
+      if( e.c.cell.ctype === 'cell' ) {
+        this.destroyCell(tile);
+        this.spawnIce(tile);
+      } else {
+
+        this.destroyCell(tile);
+      }
+      // if( )
     } else {
       this.spawnCell(tile);
     }
