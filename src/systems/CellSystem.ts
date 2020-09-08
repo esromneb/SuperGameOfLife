@@ -80,7 +80,10 @@ class CellSystem extends ApeECS.System {
 
     for( let p of ok ) {
       const e = this.world.getEntity(`c${p[0]}_${p[1]}`);
-      if( !!e ) {
+
+      const exists: boolean = !!e;
+
+      if( exists && e.c.cell.ctype !== 'ice' ) {
         count++;
       }
     }
@@ -97,6 +100,34 @@ class CellSystem extends ApeECS.System {
     }
   }
 
+  normalRules(tile: Vec2, key: string, kill: Vec2[], spawn: Vec2[]): void {
+    const count = this.countNeighbors(tile);
+    // the rules of the game
+    // it's ok to kill a cell if it doesn't exist
+    if( count < 2 ) {
+      kill.push(tile);
+    } else if( count > 3 ) {
+      kill.push(tile);
+    }
+
+    // we should guard spawnCell according to the rules
+    if( count === 3 && !(this.tileHasCell(tile))) {
+      spawn.push(tile);
+    }
+  }
+
+  iceRules(tile: Vec2, key: string, kill: Vec2[], spawn: Vec2[]): void {
+    const count = this.countNeighbors(tile);
+
+    // does not kill if alone
+    // but kill 3 or more neighbors
+    if( count > 2 ) {
+      kill.push(tile);
+    }
+  }
+
+
+
   // Any live cell with fewer than two live neighbours dies, as if by underpopulation.
   // Any live cell with two or three live neighbours lives on to the next generation.
   // Any live cell with more than three live neighbours dies, as if by overpopulation.
@@ -111,20 +142,16 @@ class CellSystem extends ApeECS.System {
     let neighbors = {};
     for(let x = 0; x < sz[0]; x++) {
       for(let y = 0; y < sz[1]; y++) {
+        const tile: Vec2 = [x,y];
         const key = `c${x}_${y}`;
-        const count = neighbors[key] = this.countNeighbors([x,y]);
-        // the rules of the game
-        // it's ok to kill a cell if it doesn't exist
-        if( count < 2 ) {
-          kill.push([x,y]);
-        } else if( count > 3 ) {
-          kill.push([x,y]);
+
+        const e = this.cellInTile(tile);
+        if(!!e && e.c.cell.ctype === 'ice' ) {
+          this.iceRules(tile, key, kill, spawn)
+        } else {
+          this.normalRules(tile, key, kill, spawn);
         }
 
-        // we should guard spawnCell according to the rules
-        if( count === 3 && !(this.tileHasCell([x,y]))) {
-          spawn.push([x,y]);
-        }
 
       }
     }
