@@ -180,7 +180,7 @@ class CellSystem extends ApeECS.System {
           {
             type: 'Sprite',
             key: 's0',
-            frame: 'pearl_01d',
+            // frame: 'pearl_01d',
             container: game.layers.main,
             scale: this.spriteSize,
           },
@@ -212,12 +212,14 @@ class CellSystem extends ApeECS.System {
         }
       ]
     });
+
+    this.updateCellGraphics(e);
     return e;
   }
 
   updateCellGraphics(e) {
     if(e.c.cell.ctype === 'cell') {
-      e.c.cell.sprite.c.s0.frame = 'pearl_01c';
+      e.c.cell.sprite.c.s0.frame = 'pearl_01d';
     } else if( e.c.cell.ctype === 'ice' ) {
       e.c.cell.sprite.c.s0.frame = 'ice_01';
     }
