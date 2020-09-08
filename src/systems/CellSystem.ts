@@ -259,11 +259,21 @@ class CellSystem extends ApeECS.System {
   }
 
   updateCellGraphics(e) {
-    if(e.c.cell.ctype === 'cell') {
-      e.c.cell.sprite.c.s0.frame = 'pearl_01d';
-    } else if( e.c.cell.ctype === 'ice' ) {
-      e.c.cell.sprite.c.s0.frame = 'ice_01';
+    let frame;
+
+    switch(e.c.cell.ctype) {
+      case 'potion':
+        frame = 'potion_03a';
+        break;
+      case 'ice':
+        frame = 'ice_01';
+        break;
+      default:
+      case 'cell':
+        frame = 'pearl_01d';
+        break;
     }
+    e.c.cell.sprite.c.s0.frame = frame;
   }
 
   spawnIce(tile: Vec2): Entity {
@@ -271,6 +281,17 @@ class CellSystem extends ApeECS.System {
 
     // e.c.cell.sprite.c.s0.color = 0xD4F1F9;
     e.c.cell.ctype = 'ice';
+
+    this.updateCellGraphics(e);
+
+    return e;
+  }
+
+  spawnPotion(tile: Vec2): Entity {
+    const e = this.spawnCell(tile);
+
+    // e.c.cell.sprite.c.s0.color = 0xD4F1F9;
+    e.c.cell.ctype = 'potion';
 
     this.updateCellGraphics(e);
 
@@ -292,9 +313,13 @@ class CellSystem extends ApeECS.System {
   mutateCell(tile: Vec2): void {
     if(this.tileHasCell(tile)) {
       const e = this.cellInTile(tile);
-      if( e.c.cell.ctype === 'cell' ) {
+      const type = e.c.cell.ctype;
+      if( type === 'cell' ) {
         this.destroyCell(tile);
         this.spawnIce(tile);
+      } else if( type === 'ice' ) {
+        this.destroyCell(tile);
+        this.spawnPotion(tile);
       } else {
 
         this.destroyCell(tile);
