@@ -174,7 +174,7 @@ static properties = {
 
 export class PotionEffect extends Component {
 static properties = {
-    crowdProtection: 0,
-    aloneProtection: 0,
+    crowdProtection: undefined,
+    aloneProtection: undefined,
   };
 };

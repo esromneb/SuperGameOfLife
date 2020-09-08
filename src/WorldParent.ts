@@ -77,6 +77,8 @@ class WorldParent extends Scene {
     this.input.finalInit();
     this.cell.finalInit();
 
+    this.input.changeUIMode('mutate');
+
 
     this.cell.spawnCell([0,0]);
     this.cell.spawnCell([1,1]);

@@ -60,10 +60,12 @@ class CellSystem extends ApeECS.System {
     return !!e;
   }
 
-  countNeighbors(tile: Vec2): number {
+  // returns a list of valid tiles around this tile
+  // valid means they are not negative
+  getValidNeighborTiles(tile: Vec2): Vec2[] {
     const [x,y] = tile;
       
-    const pos = [
+    const pos: Vec2[] = [
     [x-1,y-1],
     [x-0,y-1],
     [x+1,y-1],
@@ -75,6 +77,11 @@ class CellSystem extends ApeECS.System {
     ];
 
     const ok = pos.filter(z=>(z[0]>=0&&z[1]>=0));
+    return ok;
+  }
+
+  countNeighbors(tile: Vec2): number {
+    const ok = this.getValidNeighborTiles(tile);
 
     let count = 0;
 
@@ -98,6 +105,12 @@ class CellSystem extends ApeECS.System {
       this.calculateLife();
       e.destroy();
     }
+  }
+
+  // look around tile and then apply any potions (And consume them)
+  // to e
+  grabPotions(e: Entity, tile: Vec2): void {
+
   }
 
   normalRules(tile: Vec2, key: string, kill: Vec2[], spawn: Vec2[]): void {
@@ -287,8 +300,20 @@ class CellSystem extends ApeECS.System {
     return e;
   }
 
+  // , options: any
   spawnPotion(tile: Vec2): Entity {
     const e = this.spawnCell(tile);
+
+
+    // if( options.crowdProtection ) {
+
+    // }
+
+    e.addComponent({
+      type: 'PotionEffect',
+      crowdProtection: 3,
+    });
+
 
     // e.c.cell.sprite.c.s0.color = 0xD4F1F9;
     e.c.cell.ctype = 'potion';
