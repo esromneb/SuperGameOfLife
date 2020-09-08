@@ -90,7 +90,7 @@ class CellSystem extends ApeECS.System {
 
       const exists: boolean = !!e;
 
-      if( exists && e.c.cell.ctype !== 'ice' ) {
+      if( exists && e.c.cell.ctype !== 'ice' && e.c.cell.ctype !== 'potion' ) {
         count++;
       }
     }
@@ -108,12 +108,33 @@ class CellSystem extends ApeECS.System {
   }
 
   // look around tile and then apply any potions (And consume them)
-  // to e
-  grabPotions(e: Entity, tile: Vec2): void {
+  // pass kill from the rules function so that we can also delete
+  // the potion
+  grabPotions(consumer: Entity, tile: Vec2, kill: Vec2[]): void {
+    const valid = this.getValidNeighborTiles(tile);
+    for(let t of valid) {
+      const e = this.cellInTile(t);
+      if( !!e && e.c.cell.ctype === 'potion' ) {
+        // consumer.addComponent()
+        // console.log(e.types['PotionEffect']);
+        for( const effect of e.types['PotionEffect'] ) {
+          // console.log(effect.getObject());
+          consumer.addComponent(effect.getObject());
+        }
 
+        // destroy the potion
+        kill.push(t);
+      }
+    }
   }
 
   normalRules(tile: Vec2, key: string, kill: Vec2[], spawn: Vec2[]): void {
+    const e = this.cellInTile(tile);
+    if( !!e ) {
+      this.grabPotions(e, tile, kill);
+    }
+
+
     const count = this.countNeighbors(tile);
     // the rules of the game
     // it's ok to kill a cell if it doesn't exist
@@ -159,6 +180,9 @@ class CellSystem extends ApeECS.System {
         const e = this.cellInTile(tile);
         if(!!e && e.c.cell.ctype === 'ice' ) {
           this.iceRules(tile, key, kill, spawn)
+        } else if (!!e && e.c.cell.ctype === 'potion' ) {
+          // do nothing for potions
+          // they are destroyed when consumed by a neighbor cell
         } else {
           this.normalRules(tile, key, kill, spawn);
         }
@@ -178,6 +202,15 @@ class CellSystem extends ApeECS.System {
     }
   }
 
+  getEffectDescription(c: Component): string {
+    let ret = '';
+    if( c.crowdProtection != undefined ) {
+      ret += `crowd protection +${c.crowdProtection}`;
+    }
+
+    return ret;
+  }
+
 
   getDescription(tile: Vec2): string {
 
@@ -187,7 +220,19 @@ class CellSystem extends ApeECS.System {
       if( e.c.cell.ctype === 'ice' ) {
         return 'Ice Block';
       } else {
-        return 'Cell';
+        let base = 'Cell';
+
+        // e.types[] may return undefined
+        // to make this easier, if we get undefined
+        // we simply give an empty set
+        // this skips having an extra if which first checks
+        // if the key is in types, and then later runs the loop
+        const potions = e.types['PotionEffect'] || new Set();
+        for( const effect of potions ) {
+          base += ' ' + this.getEffectDescription(effect);
+        }
+
+        return base;
       }
 
     }
