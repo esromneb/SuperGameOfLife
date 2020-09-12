@@ -265,79 +265,16 @@ class InputSystem extends ApeECS.System {
   }
 
   drawButtons() {
-    let button = new Pixi.Graphics();
-    // this.border = button;
 
-    this.wp.addChild(button);
-
-    // const {width,height} = this.wp.gamec;
-
-    let [ox,oy] = [400,400];
-
-    let width  =  90;
-    let height =  40;
+    let x = 700-80;
+    let n = 0;
+    const dimensions: Vec2 = [60,40];
 
 
-    // Move it to the top left
-    button.position.set(ox, oy);
-
-    button.beginFill(0x444444);
-
-    button.drawRect(0,0, width, height );
-
-
-    button.buttonMode = true;
-    button.interactive = true;
-
-    let onButtonDown = (x) => {
-      console.log(x);
-    }
-
-    let onButtonUp = (x) => {
-      this.wp.cell.calculateLife();
-      // console.log(x.data.originalEvent.which);
-    }
-
-    let onButtonOver = (x) => {
-      console.log(x);
-    }
-
-    let onButtonOut = (x) => {
-      console.log(x);
-    }
-
-    button
-        // set the mousedown and touchstart callback...
-        .on('mousedown', onButtonDown)
-        .on('touchstart', onButtonDown)
-
-        // set the mouseup and touchend callback...
-        .on('mouseup', onButtonUp)
-        .on('touchend', onButtonUp)
-        .on('mouseupoutside', onButtonUp)
-        .on('touchendoutside', onButtonUp)
-
-        // set the mouseover callback...
-        .on('mouseover', onButtonOver)
-
-        // set the mouseout callback...
-        .on('mouseout', onButtonOut)
-
-
-    let text = new Pixi.Text(
-      'Step',
-      {fontFamily : 'Arial', fontSize: 14, fill : 0xffffff, align : 'center'}
-      );
-    this.wp.addChild(text);
-
-    text.position.set(ox,oy);
-
-
-
-    this.drawButton2();
-    this.buttons[0] = this.addButton(0, [700,400], [60,40]);
-    this.buttons[1] = this.addButton(1, [780,400], [60,40]);
-    this.buttons[2] = this.addButton(2, [860,400], [60,40]);
+    this.buttons[0] = this.addButton(n++, [(x+=80),400], dimensions);
+    this.buttons[1] = this.addButton(n++, [(x+=80),400], dimensions);
+    this.buttons[2] = this.addButton(n++, [(x+=80),400], dimensions);
+    this.buttons[3] = this.addButton(n++, [(x+=80),400], dimensions);
 
     // console.log(this.buttons[2].text.c.position);
     // this.buttons[2].text.c.position.x = 60;
@@ -409,7 +346,7 @@ class InputSystem extends ApeECS.System {
 
 
     ret.button = button;
-    ret.text = this.wp.sprite.addText('but 0', pos, buttonTextStyle);
+    ret.text = this.wp.sprite.addText(`button ${n} default text`, pos, buttonTextStyle);
     // let text = new Pixi.Text('Step',{fontFamily : 'Arial', fontSize: 14, fill : 0xffffff, align : 'center'});
     // this.wp.addChild(text);
 
@@ -417,72 +354,6 @@ class InputSystem extends ApeECS.System {
     return ret;
   }
 
-
-  drawButton2(): any {
-    let button = new Pixi.Graphics();
-    // this.border = button;
-
-    this.wp.addChild(button);
-
-    // const {width,height} = this.wp.gamec;
-
-    let [ox,oy] = [500,400];
-
-    let width  =  90;
-    let height =  40;
-
-
-    // Move it to the top left
-    button.position.set(ox, oy);
-
-    button.beginFill(0x444444);
-
-    button.drawRect(0,0, width, height );
-
-
-    button.buttonMode = true;
-    button.interactive = true;
-
-    let onButtonDown = (x) => {
-      console.log(x);
-    }
-
-    let onButtonUp = (x) => {
-      this.wp.cell.calculateLife();
-      console.log(x);
-    }
-
-    let onButtonOver = (x) => {
-      console.log(x);
-    }
-
-    let onButtonOut = (x) => {
-      console.log(x);
-    }
-
-    button
-        // set the mousedown and touchstart callback...
-        .on('mousedown', onButtonDown)
-        .on('touchstart', onButtonDown)
-
-        // set the mouseup and touchend callback...
-        .on('mouseup', onButtonUp)
-        .on('touchend', onButtonUp)
-        .on('mouseupoutside', onButtonUp)
-        .on('touchendoutside', onButtonUp)
-
-        // set the mouseover callback...
-        // .on('mouseover', onButtonOver)
-
-        // set the mouseout callback...
-        // .on('mouseout', onButtonOut)
-
-
-    let text = new Pixi.Text('Step',{fontFamily : 'Arial', fontSize: 14, fill : 0xffffff, align : 'center'});
-    this.wp.addChild(text);
-
-    text.position.set(ox,oy);
-  }
 
   private leftMouseDragNormal(m: Vec2, start: Vec2): void {
     console.log(`drag from [${start[0]},${start[1]}]  to  [${m[0]},${m[1]}]`);
@@ -505,26 +376,21 @@ class InputSystem extends ApeECS.System {
     console.log("entering normal mode");
     this.setHoverText('normal');
     this.setButtonText(0, 'Step');
-    this.setButtonText(1, 'Add');
+    this.setButtonText(1, '-');
     this.setButtonText(2, 'Mutate');
-  }
-
-  private enterDropMode(): void {
-    console.log("entering enterDropMode mode");
-    this.setHoverText('drop');
   }
 
   private handleNormalButton(n: number): void {
     console.log("handle normal button " + n + " on frame " + this.world.currentTick);
     switch(n) {
-      case 0:
+      case 1:
         // this.world.createEntity({components: [{type: 'StepSimulation'}]});
         this.world.createEntity({c:{StepSimulation:{}}});
         break;
-      case 1:
-        this.changeUIMode('drop');
-        break;
-      case 2:
+      // case 1:
+      //   this.changeUIMode('drop');
+      //   break;
+      case 3:
         this.changeUIMode('mutate');
         break;
       default:
@@ -533,22 +399,31 @@ class InputSystem extends ApeECS.System {
     }
   }
 
+  private enterDropMode(): void {
+    console.log("entering enterDropMode mode");
+    this.setHoverText('drop');
+  }
+
   private enterMutateMode(): void {
-    this.setButtonText(0, 'Step');
-    this.setButtonText(1, 'Exit Mode');
-    this.setButtonText(2, 'Mutate');
+    this.setButtonText(0, 'Step\nBack');
+    this.setButtonText(1, 'Step');
+    this.setButtonText(2, 'Exit Mode');
+    this.setButtonText(3, 'Mutate');
   }
 
   private handleMutateButton(n: number): void {
     console.log("handle normal button " + n + " on frame " + this.world.currentTick);
     switch(n) {
       case 0:
-        this.world.createEntity({c:{StepSimulation:{}}});
+        this.world.createEntity({c:{StepSimulation:{forward:false}}});
         break;
       case 1:
-        this.changeUIMode('normal');
+        this.world.createEntity({c:{StepSimulation:{}}});
         break;
       case 2:
+        this.changeUIMode('normal');
+        break;
+      case 3:
         break;
       default:
         console.log(`Unhandled ${n} in handleNormalButton()`);

@@ -4,6 +4,10 @@ import {
 Vec2
 } from '../Types'
 
+import {
+hsvToRgb,
+} from 'colorsys'
+
 
 import {
   System,
@@ -23,6 +27,20 @@ const ApeECS = {
 };
 
 
+// takes the output of hsvToRgb and converts it to a number
+// pixi.js can use
+function colorToHex(c: any): number {
+  let {r,g,b} = c;
+
+  let ret = (r << 16) | (g<<8) | b;
+
+  return ret;
+}
+
+function hsv(h: number, s: number, v: number): number {
+  return colorToHex(hsvToRgb(h,s,v));
+}
+
 class CellSystem extends ApeECS.System {
 
   // spriteQuery: Query;
@@ -41,7 +59,6 @@ class CellSystem extends ApeECS.System {
 
   init() {
 
-    // @ts-ignore
     this.stepQ = this.createQuery()
       .fromAll('StepSimulation')
       .persist();
@@ -101,10 +118,22 @@ class CellSystem extends ApeECS.System {
   update(tick) {
     const q = this.stepQ.execute();
     for(const e of q) {
-      console.log("step simulation on frame " + this.world.currentTick);
-      this.calculateLife();
+      
+      if( !!e.c.StepSimulation.forward ) {
+        this.stepForward();
+      } else {
+        this.wp.history.stepBackwards();
+      }
+
+
       e.destroy();
     }
+  }
+
+  stepForward(): void {
+    console.log("step simulation on frame " + this.world.currentTick);
+      this.wp.history.saveCellHistory();
+      this.calculateLife();
   }
 
   // look around tile and then apply any potions (And consume them)
@@ -112,6 +141,8 @@ class CellSystem extends ApeECS.System {
   // the potion
   grabPotions(consumer: Entity, tile: Vec2, kill: Vec2[]): void {
     const valid = this.getValidNeighborTiles(tile);
+    // check each neighbor
+    // if it's a cell, drink the potion
     for(let t of valid) {
       const e = this.cellInTile(t);
       if( !!e && e.c.cell.ctype === 'potion' ) {
@@ -124,28 +155,79 @@ class CellSystem extends ApeECS.System {
 
         // destroy the potion
         kill.push(t);
+
+        // console.log("drank potion");
+        // update cell color now that it consumed the potion
+        this.updateCellGraphics(consumer);
       }
     }
   }
 
+  // looks for effects
+  // these two numbers are used to determine the rules of the game
+  // cells with fewer neighbors than [0] will die
+  // cells with neighbors between [0] and [1] will survive
+  // empty space with neighbors between [1] and ([1]+1) will spawn
+  adjustedRuleTolerances(e: Entity | undefined): Vec2 {
+    if( e == undefined ) {
+      return [2, 3];
+    }
+
+    // seems like increasing crowd protection has the side effect
+    // of making it harder to spawn in a tile
+    // this is ignored however because empty tiles always
+    // use default rules
+    // once this gets changed this needs to be re-visited FIXME
+
+    let alone = 2;
+    let crowded = 3;
+
+    const potions = e.types['PotionEffect'] || new Set();
+
+    for( const effect of potions ) {
+      if( effect.crowdProtection != undefined ) {
+        crowded += effect.crowdProtection;
+      }
+    }
+
+    return [alone, crowded];
+  }
+
   normalRules(tile: Vec2, key: string, kill: Vec2[], spawn: Vec2[]): void {
     const e = this.cellInTile(tile);
-    if( !!e ) {
+    const populated: boolean = !!e;
+    if( populated ) {
       this.grabPotions(e, tile, kill);
+    }
+
+    const [alone_count, crowd_count] = this.adjustedRuleTolerances(e);
+    const spawn_upper = crowd_count+1;
+
+    let print = false;
+    if( alone_count !== 2 || crowd_count !== 3 ) {
+      print = true;
     }
 
 
     const count = this.countNeighbors(tile);
+
+    if( print ) {
+      console.log(`Cell has ${count} neighbors and comparing [${alone_count},${crowd_count}] `);
+    }
+
     // the rules of the game
     // it's ok to kill a cell if it doesn't exist
-    if( count < 2 ) {
+    if( count < alone_count ) {
       kill.push(tile);
-    } else if( count > 3 ) {
+    } else if( count > crowd_count ) {
       kill.push(tile);
     }
 
     // we should guard spawnCell according to the rules
-    if( count === 3 && !(this.tileHasCell(tile))) {
+    // before this said count === 3
+    // however we are using fractional neighbor counts
+    // so we take this to mean (count >= 3) && (count < 4)
+    if( ((count >= crowd_count) && (count < spawn_upper))   && (!populated) ) {
       spawn.push(tile);
     }
   }
@@ -260,6 +342,31 @@ class CellSystem extends ApeECS.System {
     return ret;
   }
 
+  // takes a POJO (plain old javascript object) and makes a cell
+  // pass the output of e.getObject() to this function to re-create
+  // the cell
+
+  spawnCellFromObject(pojo: any): Entity|any {
+    // console.log(pojo);
+    const tile = pojo.c.tile.vec2;
+    // console.log(tile);
+    if( tile == undefined ) {
+      throw new Error(`spawnCellFromObject: tile was not found on argument object`);
+    }
+    const existing = this.world.getEntity(`c${tile[0]}_${tile[1]}`);
+    if( !!existing ) {
+      return existing;
+    }
+
+    const s = this._createSpriteDuringSpawn(tile);
+
+    const e = this.world.createEntity(pojo);
+    e.c.cell.sprite = s;
+    this.updateCellGraphics(e);
+    return e;
+  }
+
+
   // returns the new entity if spawned
   // returns the existing one if something already exists here
   spawnCell(tile: Vec2): Entity {
@@ -269,29 +376,7 @@ class CellSystem extends ApeECS.System {
       return existing;
     }
 
-    const [x,y] = this.wp.board.tileToPixel(tile);
-
-    const game = this.wp.gamec;
-
-    const s = this.world.createEntity({
-        tags: ['New'],
-        components: [
-          {
-            type: 'Sprite',
-            key: 's0',
-            // frame: 'pearl_01d',
-            container: game.layers.main,
-            scale: this.spriteSize,
-          },
-          {
-            type: 'Position',
-            key: 'position',
-            x,
-            y,
-            angle: 0,
-          }
-        ]
-      });
+    const s = this._createSpriteDuringSpawn(tile);
 
     // we use an id for this entity which is composed of the letter c and the tiles 
     // coordinates.  This allows us to fetch this entity on demand if we have a tile
@@ -301,8 +386,7 @@ class CellSystem extends ApeECS.System {
         {
           type: 'Tile',
           key: 'tile',
-          x,
-          y
+          vec2: tile,
         },
         {
           type: 'Cell',
@@ -316,8 +400,65 @@ class CellSystem extends ApeECS.System {
     return e;
   }
 
+  _createSpriteDuringSpawn(tile: Vec2): Entity {
+    const [x,y] = this.wp.board.tileToPixel(tile);
+
+
+    const s = this.world.createEntity({
+        tags: ['New'],
+        components: [
+          {
+            type: 'Sprite',
+            key: 's0',
+            // frame: 'pearl_01d',
+            scale: this.spriteSize,
+          },
+          {
+            type: 'Position',
+            key: 'position',
+            x,
+            y,
+          }
+        ]
+      });
+
+    return s;
+  }
+
+
+  ds: number = 85;  // saturation
+  dv: number = 100; // value
+
+  cellColor(e): number {
+    // base color for default cells (cells with no potion effects)
+
+    let tint;
+    // let tint = 0x00ff00;
+    let hue = 100;
+
+    // console.log("here");
+    // console.log(hslToRgb(360, 100, 100));
+    // console.log(hslToRgb(50, 80, 50));
+    // console.log(hslToRgb(355, 80, 50));
+
+    // tint = colorToHex(hsvToRgb(delme, this.ds, this.dv));
+    // console.log(`h: ${delme} rgb: ${tint.toString(16)}`)
+
+
+        const potions = e.types['PotionEffect'] || new Set();
+        for( const effect of potions ) {
+          hue += 90;
+          // base += ' ' + this.getEffectDescription(effect);
+        }
+
+    tint = hsv(hue, this.ds, this.dv);
+
+    return tint;
+  }
+
   updateCellGraphics(e) {
     let frame;
+    let tint = 0xffffff;
 
     switch(e.c.cell.ctype) {
       case 'potion':
@@ -328,10 +469,15 @@ class CellSystem extends ApeECS.System {
         break;
       default:
       case 'cell':
-        frame = 'pearl_01d';
+        frame = 'pearl_01a';
+        tint = this.cellColor(e);
         break;
     }
     e.c.cell.sprite.c.s0.frame = frame;
+    e.c.cell.sprite.c.s0.tint = tint;
+
+    e.c.cell.sprite.addTag('UpdateSprite');
+
   }
 
   spawnIce(tile: Vec2): Entity {
@@ -397,6 +543,33 @@ class CellSystem extends ApeECS.System {
       // if( )
     } else {
       this.spawnCell(tile);
+    }
+  }
+
+  destroyAllCells(): void {
+    const gboard = this.world.getEntity('gboard');
+    const sz = gboard.c.board.tiles;
+    // let kill: Vec2[] = [];
+    // let spawn: Vec2[] = [];
+
+    let neighbors = {};
+    for(let x = 0; x < sz[0]; x++) {
+      for(let y = 0; y < sz[1]; y++) {
+        const tile: Vec2 = [x,y];
+        const key = `c${x}_${y}`;
+
+        this.destroyCell(tile);
+
+        // const e = this.cellInTile(tile);
+        // if(!!e && e.c.cell.ctype === 'ice' ) {
+        //   this.iceRules(tile, key, kill, spawn)
+        // } else if (!!e && e.c.cell.ctype === 'potion' ) {
+        //   // do nothing for potions
+        //   // they are destroyed when consumed by a neighbor cell
+        // } else {
+        //   this.normalRules(tile, key, kill, spawn);
+        // }
+      }
     }
   }
 

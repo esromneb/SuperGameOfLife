@@ -168,6 +168,7 @@ static properties = {
 
 export class StepSimulation extends Component {
 static properties = {
+    forward: true, // set to false to step back
   };
 };
 
@@ -176,5 +177,11 @@ export class PotionEffect extends Component {
 static properties = {
     crowdProtection: undefined,
     aloneProtection: undefined,
+  };
+};
+
+export class CellHistory extends Component {
+static properties = {
+    snapshots: []
   };
 };

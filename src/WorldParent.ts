@@ -5,6 +5,7 @@ import {SpriteSystem} from './systems/SpriteSystem'
 import {BoardSystem} from './systems/BoardSystem'
 import {CellSystem} from './systems/CellSystem'
 import {InputSystem} from './systems/InputSystem'
+import {HistorySystem} from './systems/HistorySystem'
 
 // import {GlobalState} from './components/Components'
 
@@ -33,12 +34,14 @@ class WorldParent extends Scene {
   board: BoardSystem;
   cell: CellSystem;
   input: InputSystem;
+  history: HistorySystem;
 
   eboard: Entity;
 
   gentity: Entity;
   gamec: Component;
   mouse: Entity;
+  snapshots: Entity;
 
   constructor(game: any, public options: any = {}) {
     super(game);
@@ -81,15 +84,15 @@ class WorldParent extends Scene {
 
 
     this.cell.spawnCell([0,0]);
-    this.cell.spawnCell([1,1]);
-    this.cell.spawnCell([1,0]);
-    this.cell.spawnCell([2,2]);
+    // this.cell.spawnCell([1,1]);
+    // this.cell.spawnCell([1,0]);
+    // this.cell.spawnCell([2,2]);
 
-    this.cell.spawnCell([5,4]);
-    this.cell.spawnCell([5,5]);
-    this.cell.spawnCell([5,6]);
-    this.cell.spawnCell([4,5]);
-    this.cell.spawnCell([6,5]);
+    // this.cell.spawnCell([5,4]);
+    // this.cell.spawnCell([5,5]);
+    // this.cell.spawnCell([5,6]);
+    // this.cell.spawnCell([4,5]);
+    // this.cell.spawnCell([6,5]);
 
   }
 
@@ -133,6 +136,16 @@ class WorldParent extends Scene {
       ]
     });
 
+    this.snapshots = this.world.createEntity({
+      id: 'chistory',
+      components: [
+        {
+          type: 'CellHistory',
+          key: 'history',
+        },
+      ]
+    });
+
 
   }
 
@@ -163,10 +176,11 @@ class WorldParent extends Scene {
   }
 
   setupSystems(): void {
-    this.sprite     = this.world.registerSystem('sprite', new SpriteSystem(this.world, this));
-    this.board      = this.world.registerSystem('board',  new BoardSystem(this.world, this));
-    this.cell       = this.world.registerSystem('cell',   new CellSystem(this.world, this));
-    this.input      = this.world.registerSystem('input',  new InputSystem(this.world, this));
+    this.sprite     = this.world.registerSystem('sprite',  new SpriteSystem(this.world, this));
+    this.board      = this.world.registerSystem('board',   new BoardSystem(this.world, this));
+    this.cell       = this.world.registerSystem('cell',    new CellSystem(this.world, this));
+    this.input      = this.world.registerSystem('input',   new InputSystem(this.world, this));
+    this.history    = this.world.registerSystem('history', new HistorySystem(this.world, this));
   }
 
   registerComponents(): void {
@@ -181,9 +195,11 @@ class WorldParent extends Scene {
 
     tags.push('New');
     tags.push('Station');
+    tags.push('UpdateSprite');
 
     this.world.registerTags(...tags);
   }
+
 
 }
 

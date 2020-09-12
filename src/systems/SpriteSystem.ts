@@ -31,6 +31,7 @@ class SpriteSystem extends ApeECS.System {
   posQuery: Query;
   newGraphicsQ: Query;
   newTextQ: Query;
+  updateQ: Query;
   game: any;
   wp: WorldParent;
 
@@ -41,25 +42,25 @@ class SpriteSystem extends ApeECS.System {
 
   init() {
 
-    // @ts-ignore
     this.newSpritesQ = this.createQuery()
       .fromAll('Sprite', 'New')
       .persist();
 
-    // @ts-ignore
     this.posQuery = this.createQuery()
       .fromAny('Sprite', 'GraphicsSprite')
       .fromAll('Position')
       .persist();
 
-    // @ts-ignore
     this.newGraphicsQ = this.createQuery()
       .fromAll('GraphicsSprite', 'New')
       .persist();
 
-    // @ts-ignore
     this.newTextQ = this.createQuery()
       .fromAll('TextSprite', 'New')
+      .persist();
+
+    this.updateQ = this.createQuery()
+      .fromAll('UpdateSprite')
       .persist();
 
     this.game = this.world.getEntity('gentity').c.game;
@@ -70,6 +71,7 @@ class SpriteSystem extends ApeECS.System {
     this.spawnGraphicSprites(tick);
     this.spawnSprites(tick);
     this.updatePositions(tick);
+    this.updateOther(tick);
   }
 
   private spawnText(tick) {
@@ -88,7 +90,7 @@ class SpriteSystem extends ApeECS.System {
           sprite.container.addChild(sprite.sprite);
       }
       e.removeTag('New');
-      console.log('New Text Sprite');
+      // console.log('New Text Sprite');
     }
   }
 
@@ -102,7 +104,7 @@ class SpriteSystem extends ApeECS.System {
         sprite.sprite.scale.set(sprite.scale);
         sprite.sprite.tint = sprite.color;
         if (!sprite.container) {
-          sprite.container = this.game.layers[sprite.layer];
+          sprite.container = this.game.layers.main;
         }
         if (sprite.container)
           sprite.container.addChild(sprite.sprite);
@@ -124,6 +126,25 @@ class SpriteSystem extends ApeECS.System {
           }
         }
       }
+    }
+  }
+
+  private updateOther(tick) {
+    const q = this.updateQ.execute();
+    for (const e of q) {
+      // for (const pos of e.getComponents('Position')) {
+        for (const sprite of [...e.getComponents('Sprite'), ...e.getComponents('GraphicsSprite'), ...e.getComponents('TextSprite')]) {
+          // console.log(sprite);
+          // console.log(e);
+          sprite.sprite.tint = sprite.tint;
+          // sprite.sprite.position.set(pos.x, pos.y);
+          // sprite.sprite.rotation = pos.angle;// + Math.PI / 2;
+          // if( sprite.type === "TextSprite" ) {
+          //   sprite.sprite.text = sprite.text;
+          // }
+        }
+      // }
+      e.removeTag('UpdateSprite');
     }
   }
 
