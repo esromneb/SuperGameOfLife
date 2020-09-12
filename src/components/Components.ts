@@ -172,6 +172,12 @@ static properties = {
   };
 };
 
+// created whenever a cell changes and or the board steps
+export class CellStateChanged extends Component {
+static properties = {
+  };
+};
+
 
 export class PotionEffect extends Component {
 static properties = {

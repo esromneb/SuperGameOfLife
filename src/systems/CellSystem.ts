@@ -124,6 +124,7 @@ class CellSystem extends ApeECS.System {
       } else {
         this.wp.history.stepBackwards();
       }
+      this.notifyCellStateChanged();
 
 
       e.destroy();
@@ -134,6 +135,16 @@ class CellSystem extends ApeECS.System {
     console.log("step simulation on frame " + this.world.currentTick);
       this.wp.history.saveCellHistory();
       this.calculateLife();
+  }
+
+  // creates a "notification" that the board state has changed
+  // this is accomplished by an entity with a component
+  // the input system reads this component
+  // the theory is that this function is not called inside any of the mutation
+  // functions (stepForward, calculateLife, spawnPotion, destroyCell, mutateCell, destroyAllCells, etc)
+  // and you must call it yourself, this should be more efficient (but possibly prone to forgetting)
+  notifyCellStateChanged(): void {
+    this.world.createEntity({c:{CellStateChanged:{}}});
   }
 
   // look around tile and then apply any potions (And consume them)

@@ -84,15 +84,15 @@ class WorldParent extends Scene {
 
 
     this.cell.spawnCell([0,0]);
-    // this.cell.spawnCell([1,1]);
-    // this.cell.spawnCell([1,0]);
-    // this.cell.spawnCell([2,2]);
+    this.cell.spawnCell([1,1]);
+    this.cell.spawnCell([1,0]);
+    this.cell.spawnCell([2,2]);
 
-    // this.cell.spawnCell([5,4]);
-    // this.cell.spawnCell([5,5]);
-    // this.cell.spawnCell([5,6]);
-    // this.cell.spawnCell([4,5]);
-    // this.cell.spawnCell([6,5]);
+    this.cell.spawnCell([5,4]);
+    this.cell.spawnCell([5,5]);
+    this.cell.spawnCell([5,6]);
+    this.cell.spawnCell([4,5]);
+    this.cell.spawnCell([6,5]);
 
   }
 

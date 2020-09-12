@@ -37,6 +37,7 @@ class InputSystem extends ApeECS.System {
   wp: WorldParent;
 
   buttonQ: Query;
+  changedQ: Query;
 
   constructor(world, worldParent) {
     super(world);
@@ -59,6 +60,7 @@ class InputSystem extends ApeECS.System {
       enter: this.enterNormalMode.bind(this),
       exit:  null,
       buttons: this.handleNormalButton.bind(this),
+      changed: null,
     },
     drop: {
       left: {
@@ -70,6 +72,7 @@ class InputSystem extends ApeECS.System {
       enter: this.enterDropMode.bind(this),
       exit:  null,
       buttons: null,
+      changed: null,
     },
     mutate: {
       left: {
@@ -81,6 +84,7 @@ class InputSystem extends ApeECS.System {
       enter: this.enterMutateMode.bind(this),
       exit:  null,
       buttons: this.handleMutateButton.bind(this),
+      changed: this.boardChangedMudate.bind(this),
     }
   };
 
@@ -89,15 +93,22 @@ class InputSystem extends ApeECS.System {
 
     // do not call .persist()
     // see comment below
-    // @ts-ignore
     this.buttonQ = this.createQuery()
       .fromAll('ButtonPress');
+
+    this.changedQ = this.createQuery()
+      .fromAll('CellStateChanged');
 
 
   }
 
   update(tick) {
     const mode = this.wp.gentity.c.ui.mode;
+    this.handleButtonUpdate(mode);
+    this.handleCellStateChanged(mode);
+  }
+
+  handleButtonUpdate(mode: string): void {
 
     // ButtonPress gets created in the callback which is bound to pixi/the browser
     // because of this, We assume that the ButtonPress gets created after
@@ -130,6 +141,24 @@ class InputSystem extends ApeECS.System {
     }
     // this.updateGraphicSprites(tick);
     // this.updateSprites(tick);
+  }
+
+  handleCellStateChanged(mode: string): void {
+    // see comment in handleButtonUpdate()
+    const q = this.changedQ.refresh().execute();
+    for(const e of q) {
+      console.log("cells changed in " + mode);
+
+      const nrow = this.matrix[mode];
+      if(nrow.changed) {
+        // console.log('found button fn');
+        nrow.changed();
+        // nrow.bu
+        // nrow.buttons
+      }
+
+      this.world.removeEntity(e);
+    }
   }
 
 
@@ -268,17 +297,25 @@ class InputSystem extends ApeECS.System {
 
     let x = 700-80;
     let n = 0;
-    const dimensions: Vec2 = [60,40];
+    const dimensions: Vec2 = [60+20,40+20];
+    const s = 80+20;
 
 
-    this.buttons[0] = this.addButton(n++, [(x+=80),400], dimensions);
-    this.buttons[1] = this.addButton(n++, [(x+=80),400], dimensions);
-    this.buttons[2] = this.addButton(n++, [(x+=80),400], dimensions);
-    this.buttons[3] = this.addButton(n++, [(x+=80),400], dimensions);
+    // this code adds buttons and increments n as well as shifting the x
+    // position to the right
+    this.buttons[n] = this.addButton(n, [(x+=s),400], dimensions); n++;
+    this.buttons[n] = this.addButton(n, [(x+=s),400], dimensions); n++;
+    this.buttons[n] = this.addButton(n, [(x+=s),400], dimensions); n++;
+    this.buttons[n] = this.addButton(n, [(x+=s),400], dimensions); n++;
+
+    // for(let i = 0; i < 4; i++) {
+    //   console.log(this.buttons[i]);
+    // }
 
     // console.log(this.buttons[2].text.c.position);
     // this.buttons[2].text.c.position.x = 60;
 
+    // setup the hover text that tracks the mouse
     this.hoverText = this.wp.sprite.addText('plce', [600,600], textStyle);
   }
 
@@ -314,6 +351,8 @@ class InputSystem extends ApeECS.System {
     let ret: any = {};
     let button = new Pixi.Graphics();
     // this.border = button;
+
+    // console.log("adding button n " + n);
 
     this.wp.addChild(button);
 
@@ -404,8 +443,17 @@ class InputSystem extends ApeECS.System {
     this.setHoverText('drop');
   }
 
+  private updateStepBackButtonText(): void {
+
+    const len = this.wp.history.cellHistoryLength();
+
+    const text = `Step Back\n1 of ${len}`;
+
+    this.setButtonText(0, text);
+  }
+
   private enterMutateMode(): void {
-    this.setButtonText(0, 'Step\nBack');
+    this.updateStepBackButtonText();
     this.setButtonText(1, 'Step');
     this.setButtonText(2, 'Exit Mode');
     this.setButtonText(3, 'Mutate');
@@ -436,6 +484,7 @@ class InputSystem extends ApeECS.System {
     const tile: Vec2 = this.wp.board.pixelToTile(px);
 
     this.wp.cell.mutateCell(tile);
+    this.wp.cell.notifyCellStateChanged();
   }
 
   private mutateHover(px: Vec2): void {
@@ -459,6 +508,10 @@ class InputSystem extends ApeECS.System {
 
     this.setHoverText(tf);
 
+  }
+
+  private boardChangedMudate(): void {
+    this.updateStepBackButtonText();
   }
 
   // ecs.createEntity({

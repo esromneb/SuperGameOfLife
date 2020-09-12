@@ -21,6 +21,13 @@ const ApeECS = {
   Component,
 };
 
+// The history is stored on an entity
+// called 'chistory'
+// The history is saved before each step.  the call to this.saveCellHistory() is made by
+// CellSytem.stepForward()
+// The history is maintained as a LIFO (last in first out) stack
+// cell objects created from the Entity (not the Entity itself) is stored
+
 class HistorySystem extends ApeECS.System {
 
   wp: WorldParent;
@@ -49,9 +56,11 @@ class HistorySystem extends ApeECS.System {
       return;
     }
 
-    console.log('stepBackwards');
+    // console.log('stepBackwards');
 
-    let snap = this.wp.snapshots.c.history.snapshots.shift();
+    // pop() here gives LIFO
+    // shift() here gives FIFO (which is wrong)
+    let snap = this.wp.snapshots.c.history.snapshots.pop();
 
     if( snap == undefined ) {
       return;
