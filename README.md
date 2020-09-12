@@ -1,5 +1,9 @@
 # SuperGameOfLife
 
+
+# Game Rules
+* Any dead cell which becomes a live cell will inherit effects from it's parents.
+
 # Assets
 Assets are from
 * https://kyrise.itch.io/kyrises-free-16x16-rpg-icon-pack

@@ -115,6 +115,17 @@ class CellSystem extends ApeECS.System {
     return count;
   }
 
+  calculateSpawnEffectsFromNeighbors(tile: Vec2): any {
+    const valid = this.getValidNeighborTiles(tile);
+    for(let t of valid ) {
+      const e = this.cellInTile(t);
+      if( !!e && e.c.cell.ctype === 'cell' ) {
+        const potions = e.types['PotionEffect'] || new Set();
+        console.log(potions);
+      }
+    }
+  }
+
   update(tick) {
     const q = this.stepQ.execute();
     for(const e of q) {
@@ -285,6 +296,20 @@ class CellSystem extends ApeECS.System {
     }
 
     // console.log(neighbors);
+
+    for( let s of spawn ) {
+      if( s[0] == 4 && s[1] == 6 ) {
+
+      } else {
+        continue;
+      }
+
+      this.calculateSpawnEffectsFromNeighbors(s);
+
+      console.log(s);
+
+
+    }
 
     for( let k of kill ) {
       this.destroyCell(k);

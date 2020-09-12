@@ -4,10 +4,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest --no-cache",
     "dev:assets": "webpack-cli --mode=development --display=verbose --watch ",
     "dev:start": "live-server --port=5000 --open=./build/ --host=localhost --watch=./build/  ",
-    "dev": "npm-run-all -p dev:*"
+    "dev": "npm-run-all -p dev:*",
+    "build": "NODE_ENV=development webpack-cli --mode='development'",
+    "pretest": "npm run build",
+    "jestc": "jest --clearCache",
+    "jestw": "jest --watch --runInBand --detectOpenHandles"
+
   },
   "author": "",
   "license": "ISC",
