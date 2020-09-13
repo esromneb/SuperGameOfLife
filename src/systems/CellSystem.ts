@@ -373,6 +373,39 @@ class CellSystem extends ApeECS.System {
       //   spawned.addComponent(effect);
       // }
     }
+
+    this.consolodateEffects();
+  }
+
+  // if a crowd effect goes below this limit it is ended
+  effectMinimum: number = 0.01;
+
+  consolodateEffects(): void {
+    const q = this.createQuery().fromAll('PotionEffect').execute();
+    for( const e of q ) {
+      let total: any = {};
+      for( let eff of e.types['PotionEffect'] ) {
+        if( eff.crowdProtection !== undefined ) {
+          if( total.crowdProtection === undefined ) {
+            total.crowdProtection = 0;
+          }
+
+          total.crowdProtection += eff.crowdProtection;
+
+        }
+        // console.log(eff);
+        e.removeComponent(eff);
+      }
+
+      if( total.crowdProtection >= this.effectMinimum ) {
+        e.addComponent(
+          {
+            type: 'PotionEffect',
+            crowdProtection: total.crowdProtection,
+          }
+        );
+      }
+    }
   }
 
   getEffectDescription(c: Component): string {
@@ -549,6 +582,8 @@ class CellSystem extends ApeECS.System {
 
 
     const potions = e.types['PotionEffect'] || new Set();
+
+
     if( false ) {
       for( const effect of potions ) {
         if( effect.crowdProtection ) {
