@@ -448,7 +448,13 @@ class InputSystem extends ApeECS.System {
 
     const len = this.wp.history.cellHistoryLength();
 
-    const text = `Step Back\n1 of ${len}`;
+    let text;
+    if( len === 0 ) {
+      text = ' -';
+    } else {
+      text = `Step Back\n1 of ${len}`;
+    }
+
 
     this.setButtonText(0, text);
   }
