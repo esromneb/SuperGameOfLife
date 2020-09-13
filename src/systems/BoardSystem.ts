@@ -80,6 +80,7 @@ class BoardSystem extends ApeECS.System {
     return [x,y];
   }
 
+  // istanbul ignore next
   pixelToTile(px: Vec2): Vec2 {
     const e = this.world.getEntity('gboard');
     // console.log(e);

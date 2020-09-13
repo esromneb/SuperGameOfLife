@@ -28,6 +28,7 @@ export class GraphicsSprite extends Component {
 
   }
 
+  // istanbul ignore next
   preDestroy() {
     if (this.sprite) {
       this.sprite.destroy();
@@ -56,6 +57,7 @@ export class Sprite extends Component {
 
   }
 
+  // istanbul ignore next
   preDestroy() {
 
     if (this.sprite) {
@@ -81,6 +83,7 @@ export class TextSprite extends Component {
 
   }
 
+  // istanbul ignore next
   preDestroy() {
 
     if (this.sprite) {

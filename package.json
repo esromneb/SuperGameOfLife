@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest --no-cache",
+    "test": "jest --no-cache --coverage",
     "dev:assets": "webpack-cli --mode=development --display=verbose --watch ",
     "dev:start": "live-server --port=5000 --open=./build/ --host=localhost --watch=./build/  ",
     "dev": "npm-run-all -p dev:*",

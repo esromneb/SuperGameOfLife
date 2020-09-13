@@ -67,6 +67,7 @@ class WorldParent extends Scene {
   update(dt?, df?, time?): void {
     // console.log("World Parent Update", dt);
     
+    // istanbul ignore if
     if( !this.testMode ) {
       this.input.updateMouse();
     }
@@ -88,6 +89,7 @@ class WorldParent extends Scene {
 
     const pattern = this.options.initialCellPattern;
 
+    // istanbul ignore if
     if( pattern === 1 ) {
       this.cell.spawnCell([0,0]);
       this.cell.spawnCell([1,1]);
@@ -101,6 +103,7 @@ class WorldParent extends Scene {
       this.cell.spawnCell([6,5]);
     }
 
+    // istanbul ignore if
     if( pattern === 2 ) {
       this.cell.spawnCell([5,5]);
       this.cell.spawnCell([6,4]);
@@ -164,6 +167,7 @@ class WorldParent extends Scene {
 
   }
 
+  // istanbul ignore next
   debugEntities(): void {
     const game = this.gamec;
     let x = 40;

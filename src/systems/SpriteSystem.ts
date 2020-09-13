@@ -25,6 +25,7 @@ const ApeECS = {
 
 import * as Pixi from 'pixi.js';
 
+// istanbul ignore next
 class SpriteSystem extends ApeECS.System {
 
   newSpritesQ: Query;

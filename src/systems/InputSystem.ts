@@ -28,6 +28,7 @@ const textStyle = {fontFamily : 'Arial', fontSize: 14, fill : 0xffffff, align : 
 const buttonTextStyle = textStyle;
 
 
+// istanbul ignore next
 class InputSystem extends ApeECS.System {
 
   // spriteQuery: Query;
