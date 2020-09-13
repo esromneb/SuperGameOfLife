@@ -47,6 +47,8 @@ class CellSystem extends ApeECS.System {
   // posQuery: Query;
   // game: any;
 
+  logSimulationStep: boolean = false;
+
   wp: WorldParent;
   stepQ: Query;
 
@@ -143,9 +145,11 @@ class CellSystem extends ApeECS.System {
   }
 
   stepForward(): void {
-    console.log("step simulation on frame " + this.world.currentTick);
-      this.wp.history.saveCellHistory();
-      this.calculateLife();
+    if( this.logSimulationStep ) {
+      console.log("step simulation on frame " + this.world.currentTick);
+    }
+    this.wp.history.saveCellHistory();
+    this.calculateLife();
   }
 
   // creates a "notification" that the board state has changed
@@ -270,8 +274,7 @@ class CellSystem extends ApeECS.System {
   // Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
 
   calculateLife() {
-    const gboard = this.world.getEntity('gboard');
-    const sz = gboard.c.board.tiles;
+    const sz = this.wp.board.getBoardSize();
     let kill: Vec2[] = [];
     let spawn: Vec2[] = [];
 

@@ -43,6 +43,8 @@ class WorldParent extends Scene {
   mouse: Entity;
   snapshots: Entity;
 
+  testMode: boolean = false; // set by unit test
+
   constructor(game: any, public options: any = {}) {
     super(game);
 
@@ -62,10 +64,12 @@ class WorldParent extends Scene {
 
   }
 
-  update(dt, df, time): void {
+  update(dt?, df?, time?): void {
     // console.log("World Parent Update", dt);
-  
-    this.input.updateMouse();
+    
+    if( !this.testMode ) {
+      this.input.updateMouse();
+    }
     this.world.runSystems('input');
     this.world.tick();
 
@@ -82,7 +86,9 @@ class WorldParent extends Scene {
 
     this.input.changeUIMode('mutate');
 
-    if( false ) {
+    const pattern = this.options.initialCellPattern;
+
+    if( pattern === 1 ) {
       this.cell.spawnCell([0,0]);
       this.cell.spawnCell([1,1]);
       this.cell.spawnCell([1,0]);
@@ -95,7 +101,7 @@ class WorldParent extends Scene {
       this.cell.spawnCell([6,5]);
     }
 
-    if( true ) {
+    if( pattern === 2 ) {
       this.cell.spawnCell([5,5]);
       this.cell.spawnCell([6,4]);
       this.cell.spawnCell([5,4]);

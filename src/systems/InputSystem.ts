@@ -412,7 +412,7 @@ class InputSystem extends ApeECS.System {
   }
 
   private enterNormalMode(): void {
-    console.log("entering normal mode");
+    // console.log("entering normal mode");
     this.setHoverText('normal');
     this.setButtonText(0, 'Step');
     this.setButtonText(1, '-');

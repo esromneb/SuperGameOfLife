@@ -106,9 +106,12 @@ class BoardSystem extends ApeECS.System {
     // const t = raw;
 
     return t;
+  }
 
-
-
+  getBoardSize(): Vec2 {
+    const gboard = this.world.getEntity('gboard');
+    const sz: Vec2 = gboard.c.board.tiles;
+    return sz;
   }
 
 
