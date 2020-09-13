@@ -146,9 +146,12 @@ class InputSystem extends ApeECS.System {
 
   handleCellStateChanged(mode: string): void {
     // see comment in handleButtonUpdate()
+
+    let anyChanges: boolean = false;
+
     const q = this.changedQ.refresh().execute();
     for(const e of q) {
-      console.log("cells changed in " + mode);
+      // console.log("cells changed in " + mode);
 
       const nrow = this.matrix[mode];
       if(nrow.changed) {
@@ -158,7 +161,12 @@ class InputSystem extends ApeECS.System {
         // nrow.buttons
       }
 
+      anyChanges = true;
       this.world.removeEntity(e);
+    }
+
+    if( anyChanges ) {
+      this.dispatchHoverUpdate();
     }
   }
 
@@ -219,7 +227,11 @@ class InputSystem extends ApeECS.System {
     this.wp.mouse.c.now.moved = moved;
 
     if( this.wp.mouse.c.now.moved ) {
+      this.dispatchHoverUpdate();
+    }
+  }
 
+  private dispatchHoverUpdate(): void {
       const mode = this.wp.gentity.c.ui.mode;
       // console.log(this.wp.game.renderer.plugins.interaction.mouse.buttons);
       // console.log(pos);
@@ -227,7 +239,6 @@ class InputSystem extends ApeECS.System {
       if(row.hover) {
         row.hover(this.wp.mouse.c.now.pos);
       }
-    }
   }
 
   private updateMouseButtons(pos: Vec2) {
