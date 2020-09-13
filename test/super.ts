@@ -145,7 +145,7 @@ test('Potion pickup is sane', () => {
 
   const cell = wp.cell;
 
-  // cell.spawnIce([5,4]);
+  cell.spawnIce([9,1]); // spawn an ice block off to the side to improve coverage, FIXME
 
   cell.spawnCell([5,4]);
   cell.spawnCell([4,5]);

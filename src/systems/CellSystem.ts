@@ -200,6 +200,7 @@ class CellSystem extends ApeECS.System {
   // pass kill from the rules function so that we can also delete
   // the potion
   grabPotions(consumer: Entity, tile: Vec2, kill: Vec2[]): void {
+    // istanbul ignore if
     if( !consumer ) {
       return;
     }
