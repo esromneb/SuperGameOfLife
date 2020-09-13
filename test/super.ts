@@ -133,3 +133,62 @@ test('Child of cell splits effects', () => {
 
 });
 
+
+
+
+
+test('Potion pickup is sane', () => {
+
+  const wp = new WorldParent({}, defaultOptions);
+  wp.testMode = true;
+
+
+  const cell = wp.cell;
+
+  // cell.spawnIce([5,4]);
+
+  cell.spawnCell([5,4]);
+  cell.spawnCell([4,5]);
+  cell.spawnCell([5,5]);
+  cell.spawnCell([6,5]);
+  cell.spawnPotion([6,4]);
+
+  // expect(matchFrame(wp, ef[0])).toBe(true);
+
+  // infect cells in 4,5  5,5  6,5
+  wp.cell.stepForward();
+  wp.update();
+
+
+  expect(wp.cell.getDescription([4,4]).match(/crowd/)).toBe(null);
+  expect(wp.cell.getDescription([4,5]).match(/crowd/)).toBe(null);
+  expect(wp.cell.getDescription([5,6]).match(/crowd/)).toBe(null);
+  expect(wp.cell.getDescription([5,4]).match(/crowd/)).not.toBe(null);
+  expect(wp.cell.getDescription([5,5]).match(/crowd/)).not.toBe(null);
+  expect(wp.cell.getDescription([6,5]).match(/crowd/)).not.toBe(null);
+
+
+  if( false ) {
+    const sz = wp.board.getBoardSize();
+
+    for(let x = 0; x < sz[0]; x++) {
+      for(let y = 0; y < sz[1]; y++) {
+        const key = `${x}_${y}`;
+        const actualCell = wp.cell.tileHasCell([x,y]);
+
+        if( actualCell ) {
+          console.log([x,y],wp.cell.getDescription([x,y]));
+        }
+
+        // const expectedCell = frame.has(key);
+        // if( expectedCell != actualCell ) {
+        //   return false;
+        // }
+      }
+    }
+
+  }
+
+ 
+
+});

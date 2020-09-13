@@ -12,7 +12,7 @@ const defaultOptions = {
   height: 1080,
   transparent: false,
   backgroundColor: 0x000000,
-  initialCellPattern: 1,
+  initialCellPattern: 3,
 };
 
 

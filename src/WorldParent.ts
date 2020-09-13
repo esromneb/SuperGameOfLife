@@ -87,9 +87,14 @@ class WorldParent extends Scene {
 
     this.input.changeUIMode('mutate');
 
+
+    this.loadInitialPattern();
+  }
+
+  // istanbul ignore next
+  loadInitialPattern(): void {
     const pattern = this.options.initialCellPattern;
 
-    // istanbul ignore if
     if( pattern === 1 ) {
       this.cell.spawnCell([0,0]);
       this.cell.spawnCell([1,1]);
@@ -103,13 +108,20 @@ class WorldParent extends Scene {
       this.cell.spawnCell([6,5]);
     }
 
-    // istanbul ignore if
     if( pattern === 2 ) {
       this.cell.spawnCell([5,5]);
       this.cell.spawnCell([6,4]);
       this.cell.spawnCell([5,4]);
       this.cell.spawnCell([6,5]);
       this.cell.spawnPotion([4,6]);
+    }
+
+    if( pattern === 3 ) {
+      this.cell.spawnCell([5,4]);
+      this.cell.spawnCell([4,5]);
+      this.cell.spawnCell([5,5]);
+      this.cell.spawnCell([6,5]);
+      this.cell.spawnPotion([6,4]);
     }
 
   }

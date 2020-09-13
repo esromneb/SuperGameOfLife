@@ -200,6 +200,9 @@ class CellSystem extends ApeECS.System {
   // pass kill from the rules function so that we can also delete
   // the potion
   grabPotions(consumer: Entity, tile: Vec2, kill: Vec2[]): void {
+    if( !consumer ) {
+      return;
+    }
     const valid = this.getValidNeighborTiles(tile);
     // check each neighbor
     // if it's a cell, drink the potion
@@ -253,11 +256,12 @@ class CellSystem extends ApeECS.System {
     return [alone, crowded];
   }
 
-  normalRules(tile: Vec2, key: string, kill: Vec2[], spawn: Vec2[]): void {
+  normalRules(tile: Vec2, key: string, kill: Vec2[], spawn: Vec2[], grab: Vec2[]): void {
     const e = this.cellInTile(tile);
     const populated: boolean = !!e;
     if( populated ) {
-      this.grabPotions(e, tile, kill);
+      grab.push(tile);
+      // this.grabPotions(e, tile, kill);
     }
 
     const [alone_count, crowd_count] = this.adjustedRuleTolerances(e);
@@ -293,7 +297,7 @@ class CellSystem extends ApeECS.System {
     }
   }
 
-  iceRules(tile: Vec2, key: string, kill: Vec2[], spawn: Vec2[]): void {
+  iceRules(tile: Vec2, key: string, kill: Vec2[], spawn: Vec2[], grab: Vec2[]): void {
     const count = this.countNeighbors(tile);
 
     // does not kill if alone
@@ -312,6 +316,7 @@ class CellSystem extends ApeECS.System {
     const sz = this.wp.board.getBoardSize();
     let kill: Vec2[] = [];
     let spawn: Vec2[] = [];
+    let grab: Vec2[] = [];
 
     let neighbors = {};
     for(let x = 0; x < sz[0]; x++) {
@@ -321,12 +326,12 @@ class CellSystem extends ApeECS.System {
 
         const e = this.cellInTile(tile);
         if(!!e && e.c.cell.ctype === 'ice' ) {
-          this.iceRules(tile, key, kill, spawn)
+          this.iceRules(tile, key, kill, spawn, grab)
         } else if (!!e && e.c.cell.ctype === 'potion' ) {
           // do nothing for potions
           // they are destroyed when consumed by a neighbor cell
         } else {
-          this.normalRules(tile, key, kill, spawn);
+          this.normalRules(tile, key, kill, spawn, grab);
         }
 
 
@@ -345,10 +350,14 @@ class CellSystem extends ApeECS.System {
       //   continue;
       // }
       childEffects[key] = this.calculateSpawnEffectsFromNeighbors(s);
+      // childEffects[key] = new Set();
 
       // console.log(s);
+    }
 
-
+    for( let g of grab ) {
+      const e = this.cellInTile(g);
+      this.grabPotions(e, g, kill);
     }
 
     for( let k of kill ) {
@@ -384,6 +393,10 @@ class CellSystem extends ApeECS.System {
         return 'Ice Block';
       } else {
         let base = 'Cell';
+
+        if( e.c.cell.ctype === 'potion' ) {
+          base = 'Potion';
+        }
 
         // e.types[] may return undefined
         // to make this easier, if we get undefined
