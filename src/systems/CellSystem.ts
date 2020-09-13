@@ -517,6 +517,7 @@ class CellSystem extends ApeECS.System {
   ds: number = 85;  // saturation
   dv: number = 100; // value
 
+  // istanbul ignore next
   cellColor(e): number {
     // base color for default cells (cells with no potion effects)
 
@@ -547,6 +548,7 @@ class CellSystem extends ApeECS.System {
     return tint;
   }
 
+  // istanbul ignore next
   updateTileGraphcs(tile: Vec2): void {
     const e = this.cellInTile(tile);
     if( !!e ) {
@@ -554,6 +556,7 @@ class CellSystem extends ApeECS.System {
     }
   }
 
+  // istanbul ignore next
   updateCellGraphics(e) {
     let frame;
     let tint = 0xffffff;
@@ -624,6 +627,7 @@ class CellSystem extends ApeECS.System {
     return true;
   }
 
+  // istanbul ignore next
   mutateCell(tile: Vec2): void {
     if(this.tileHasCell(tile)) {
       const e = this.cellInTile(tile);

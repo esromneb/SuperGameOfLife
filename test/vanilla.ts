@@ -85,3 +85,36 @@ test('Vanilla game of life rules are correct', () => {
 
 });
 
+
+test('spawnCell returns existing object when cell exists', () => {
+
+  const wp = new WorldParent({}, defaultOptions);
+  wp.testMode = true;
+  const cell = wp.cell;
+
+  // spawn a first cell
+  const e0 = cell.spawnCell([2,1]);
+
+   
+  // spawn another
+  const ne1 = cell.cellInTile([4,4]);
+
+  // verify they are not the same entity
+  expect(e0 !== ne1).toBe(true);
+
+  // destroy the first
+  cell.destroyCell([2,1]);
+
+  // spawn in the location of the first
+  const e1 = cell.spawnCell([2,1]);
+
+  // verify that the new entity is different than the old
+  expect(e0 !== e1).toBe(true);
+
+  // spawn again (heres the real test)
+  const e2 = cell.spawnCell([2,1]);
+
+  // verify it returns the same entity
+  expect(e1 === e2).toBe(true);
+});
+
