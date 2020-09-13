@@ -117,15 +117,48 @@ class CellSystem extends ApeECS.System {
     return count;
   }
 
+  // call with a tile that will spawn a cell next turn
+  // this calculates the potions that should be given to that tile
+
   calculateSpawnEffectsFromNeighbors(tile: Vec2): any {
+
+    const ret = [];
+
+    const inherit: number = 0.5; // larger aka closer to 1 means child gets more
+
     const valid = this.getValidNeighborTiles(tile);
-    for(let t of valid ) {
+    for( const t of valid ) {
+      // check a parent
       const e = this.cellInTile(t);
+      let parentUpdated = false;
       if( !!e && e.c.cell.ctype === 'cell' ) {
         const potions = e.types['PotionEffect'] || new Set();
-        console.log(potions);
+
+        // if parent has any effects
+        for(const effect of potions) {
+          let forChild = effect.getObject();
+          let forParent = effect.getObject();
+
+          if( forChild.crowdProtection != undefined ) {
+            forChild.crowdProtection *= inherit;
+            forParent.crowdProtection *= (1-inherit);
+
+            // just replace the value in the existing component
+            effect.crowdProtection = forParent.crowdProtection;
+
+            ret.push(forChild);
+            parentUpdated = true;
+          }
+
+          // console.log(effect.getObject());
+
+        }
+      }
+      if( parentUpdated ) {
+        this.updateTileGraphcs(t);
       }
     }
+    return ret;
   }
 
   update(tick) {
@@ -145,6 +178,7 @@ class CellSystem extends ApeECS.System {
   }
 
   stepForward(): void {
+    // istanbul ignore if
     if( this.logSimulationStep ) {
       console.log("step simulation on frame " + this.world.currentTick);
     }
@@ -230,13 +264,14 @@ class CellSystem extends ApeECS.System {
     const spawn_upper = crowd_count+1;
 
     let print = false;
-    if( alone_count !== 2 || crowd_count !== 3 ) {
-      print = true;
-    }
+    // if( alone_count !== 2 || crowd_count !== 3 ) {
+    //   print = true;
+    // }
 
 
     const count = this.countNeighbors(tile);
 
+    // istanbul ignore next
     if( print ) {
       console.log(`Cell has ${count} neighbors and comparing [${alone_count},${crowd_count}] `);
     }
@@ -300,16 +335,18 @@ class CellSystem extends ApeECS.System {
 
     // console.log(neighbors);
 
+    let childEffects: any = {};
+
     for( let s of spawn ) {
-      if( s[0] == 4 && s[1] == 6 ) {
+      const key = `c${s[0]}_${s[1]}`;
+      // if( s[0] == 4 && s[1] == 6 ) {
 
-      } else {
-        continue;
-      }
+      // } else {
+      //   continue;
+      // }
+      childEffects[key] = this.calculateSpawnEffectsFromNeighbors(s);
 
-      this.calculateSpawnEffectsFromNeighbors(s);
-
-      console.log(s);
+      // console.log(s);
 
 
     }
@@ -319,7 +356,12 @@ class CellSystem extends ApeECS.System {
     }
 
     for(let s of spawn ) {
-      this.spawnCell(s);
+      const key = `c${s[0]}_${s[1]}`;
+      const spawned = this.spawnCell(s, childEffects[key]);
+
+      // for(let effect of ) {
+      //   spawned.addComponent(effect);
+      // }
     }
   }
 
@@ -408,7 +450,8 @@ class CellSystem extends ApeECS.System {
 
   // returns the new entity if spawned
   // returns the existing one if something already exists here
-  spawnCell(tile: Vec2): Entity {
+  // effects is a list of component objects to add after spawning
+  spawnCell(tile: Vec2, effects?: any[]): Entity {
 
     const existing = this.world.getEntity(`c${tile[0]}_${tile[1]}`);
     if( !!existing ) {
@@ -434,6 +477,12 @@ class CellSystem extends ApeECS.System {
         }
       ]
     });
+
+    if( effects != undefined ) {
+      for(let ef of effects) {
+        e.addComponent(ef);
+      }
+    }
 
     this.updateCellGraphics(e);
     return e;
@@ -486,13 +535,23 @@ class CellSystem extends ApeECS.System {
 
         const potions = e.types['PotionEffect'] || new Set();
         for( const effect of potions ) {
-          hue += 90;
+          if( effect.crowdProtection ) {
+
+            hue += 90*effect.crowdProtection/1.5;
+          }
           // base += ' ' + this.getEffectDescription(effect);
         }
 
     tint = hsv(hue, this.ds, this.dv);
 
     return tint;
+  }
+
+  updateTileGraphcs(tile: Vec2): void {
+    const e = this.cellInTile(tile);
+    if( !!e ) {
+      this.updateCellGraphics(e);
+    }
   }
 
   updateCellGraphics(e) {
