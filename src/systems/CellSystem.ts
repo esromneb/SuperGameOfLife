@@ -548,14 +548,33 @@ class CellSystem extends ApeECS.System {
     // console.log(`h: ${delme} rgb: ${tint.toString(16)}`)
 
 
-        const potions = e.types['PotionEffect'] || new Set();
-        for( const effect of potions ) {
-          if( effect.crowdProtection ) {
+    const potions = e.types['PotionEffect'] || new Set();
+    if( false ) {
+      for( const effect of potions ) {
+        if( effect.crowdProtection ) {
 
-            hue += 90*effect.crowdProtection/1.5;
-          }
-          // base += ' ' + this.getEffectDescription(effect);
+          hue += 90*effect.crowdProtection/1.5;
         }
+        // base += ' ' + this.getEffectDescription(effect);
+      }
+    }
+
+    if( true ) {
+      let x = 0;
+      let changed: boolean = false;
+      for( const effect of potions ) {
+        if( effect.crowdProtection ) {
+          x += effect.crowdProtection;
+          changed = true;
+        }
+        // base += ' ' + this.getEffectDescription(effect);
+      }
+      if( changed ) {
+        let h = (-10/(0.02*(x+1.4)))+360;
+        hue += h;
+      }
+    }
+
 
     tint = hsv(hue, this.ds, this.dv);
 

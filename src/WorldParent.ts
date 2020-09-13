@@ -124,6 +124,15 @@ class WorldParent extends Scene {
       this.cell.spawnPotion([6,4]);
     }
 
+    if( pattern === 4 ) {
+      this.cell.spawnCell([4,2]);
+      this.cell.spawnCell([4,3]);
+      this.cell.spawnCell([4,4]);
+      this.cell.spawnCell([4,5]);
+      this.cell.spawnPotion([5,3]);
+      this.cell.spawnPotion([5,4]);
+    }
+
   }
 
   setupFirstEntities(): void {
