@@ -204,9 +204,44 @@ class InputSystem extends ApeECS.System {
   }
 
 
+  supressTap = 0;
 
   updateMouse() {
-    const xypos: VecXY = this.wp.game.renderer.plugins.interaction.mouse.global;
+
+    let xypos: VecXY;
+
+    // a bunch of hacks, I don't understand pixi.js mobile
+    // seems like activeInteractionData has a new value forever with each touch
+    let data = this.wp.game.renderer.plugins.interaction.activeInteractionData;
+    let gotTouch: boolean = false;
+    if( 2 in data ) {
+      let i;
+      for(i = 2;;i++) {
+        if( i in data ) {
+
+        } else {
+          break;
+        }
+      }
+
+      if( (i-1) === this.supressTap ) {
+        return; // dont update mouse at all
+      } else {
+
+        xypos = data[i-1].global;
+
+        let ppos: Vec2 = [xypos.x, xypos.y]
+
+        this.handleMouseUpDown('left', false, ppos);
+        this.handleMouseUpDown('left', true, ppos);
+
+        this.supressTap = i-1;
+      }
+    } else {
+      // handle desktop mouse
+      xypos = this.wp.game.renderer.plugins.interaction.mouse.global;
+    }
+
     const pos: Vec2 = [xypos.x, xypos.y]; // fresh
 
     this.updateMousePosition(pos);
@@ -242,6 +277,7 @@ class InputSystem extends ApeECS.System {
   }
 
   private updateMouseButtons(pos: Vec2) {
+    // console.log(this.wp.game.renderer.plugins.interaction.activeInteractionData);
     const buttons = this.wp.game.renderer.plugins.interaction.mouse.buttons;
     const state = this.wp.mouse.c.state;
 
