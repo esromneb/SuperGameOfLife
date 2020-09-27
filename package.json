@@ -9,6 +9,7 @@
     "dev:start": "live-server --port=5000 --open=./build/ --host=localhost --watch=./build/  ",
     "dev": "npm-run-all -p dev:*",
     "build": "NODE_ENV=development webpack-cli --mode='development'",
+    "prod": "webpack-cli",
     "pretest": "npm run build",
     "jestc": "jest --clearCache",
     "jestw": "jest --watch --runInBand --detectOpenHandles"

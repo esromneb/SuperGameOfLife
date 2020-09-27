@@ -20,3 +20,9 @@ jestc:
 # jest watch tests
 jestw:
 	npm run jestw
+
+clean:
+	rm -rf build
+
+prod:
+	npm run prod
