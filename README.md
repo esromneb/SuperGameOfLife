@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.com/esromneb/SuperGameOfLife.svg?branch=master)](https://travis-ci.com/esromneb/SuperGameOfLife)
 # SuperGameOfLife [Play Now!](https://esromneb.github.io/SuperGameOfLife/build/)
 This is an example application using [Ape-ECS](https://github.com/fritzy/ape-ecs) Entity Component System.  This is a my take on Conways Game of Life; cells can pick up potions that give them bufs and nerfs.
 
