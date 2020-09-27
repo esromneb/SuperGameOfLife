@@ -6,7 +6,7 @@
   "scripts": {
     "test": "jest --no-cache --coverage",
     "dev:assets": "webpack-cli --mode=development --display=verbose --watch ",
-    "dev:start": "live-server --port=5000 --open=./build/ --host=localhost --watch=./build/  ",
+    "dev:start": "npm run build && live-server --port=5000 --open=./build/ --host=localhost --watch=./build/  ",
     "dev": "npm-run-all -p dev:*",
     "build": "NODE_ENV=development webpack-cli --mode='development'",
     "prod": "webpack-cli",
