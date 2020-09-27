@@ -7,6 +7,10 @@ import {CellSystem} from './systems/CellSystem'
 import {InputSystem} from './systems/InputSystem'
 import {HistorySystem} from './systems/HistorySystem'
 
+import {
+Vec2
+} from './Types'
+
 // import {GlobalState} from './components/Components'
 
 import {
@@ -25,6 +29,8 @@ const ApeECS = {
   System,
   Component,
 };
+
+const boardSize: Vec2 = [12*2,8*2];
 
 
 class WorldParent extends Scene {
@@ -80,7 +86,7 @@ class WorldParent extends Scene {
 
 
   finalInit(): void {
-    this.eboard = this.board.initBoard(12,8);
+    this.eboard = this.board.initBoard(...boardSize);
     this.sprite.drawBoundaries();
     this.input.finalInit();
     this.cell.finalInit();
@@ -131,6 +137,76 @@ class WorldParent extends Scene {
       this.cell.spawnCell([4,5]);
       this.cell.spawnPotion([5,3]);
       this.cell.spawnPotion([5,4]);
+    }
+
+    if( pattern === 5 ) {
+
+      const cell: Vec2[] = [
+        [0,0],
+        [1,1],
+        [1,0],
+        [2,2],
+
+
+        [5,4],
+        [5,5],
+        [5,6],
+        [4,5],
+        [6,5],
+
+        [22,0],
+        [21,1],
+        [21,2],
+        [22,2],
+        [23,2],
+
+        [22,15],
+        [21,14],
+        [21,13],
+        [22,13],
+        [23,13],
+
+        [0,13],
+        [1,13],
+        [2,13],
+        [2,14],
+        [1,15],
+
+
+        [5,13],
+        [6,13],
+        [7,13],
+        [6,14],
+        [6,15],
+
+      ];
+
+      const potion: Vec2[] = [
+        [19,3],
+        [19,13],
+
+        [16,6],
+        [16,7],
+        [16,8],
+        [16,9],
+      ];
+
+      const ice: Vec2[] = [
+        [3,12],
+        [4,12],
+      ];
+
+      for(const s of cell) {
+        this.cell.spawnCell(s);
+      }
+      for(const s of potion) {
+        this.cell.spawnPotion(s);
+      }
+      for(const s of ice) {
+        this.cell.spawnIce(s);
+      }
+
+
     }
 
   }

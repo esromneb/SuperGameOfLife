@@ -307,18 +307,22 @@ class InputSystem extends ApeECS.System {
 
   drawButtons() {
 
-    let x = 700-80;
+    const startX = 40;
+    const startY = 700;
+
+    const s = 100;
+
+    let x = startX - s;
     let n = 0;
     const dimensions: Vec2 = [60+20,40+20];
-    const s = 80+20;
 
 
     // this code adds buttons and increments n as well as shifting the x
     // position to the right
-    this.buttons[n] = this.addButton(n, [(x+=s),400], dimensions); n++;
-    this.buttons[n] = this.addButton(n, [(x+=s),400], dimensions); n++;
-    this.buttons[n] = this.addButton(n, [(x+=s),400], dimensions); n++;
-    this.buttons[n] = this.addButton(n, [(x+=s),400], dimensions); n++;
+    this.buttons[n] = this.addButton(n, [(x+=s),startY], dimensions); n++;
+    this.buttons[n] = this.addButton(n, [(x+=s),startY], dimensions); n++;
+    this.buttons[n] = this.addButton(n, [(x+=s),startY], dimensions); n++;
+    this.buttons[n] = this.addButton(n, [(x+=s),startY], dimensions); n++;
 
     // for(let i = 0; i < 4; i++) {
     //   console.log(this.buttons[i]);
