@@ -61,7 +61,7 @@ class InputSystem extends ApeECS.System {
       enter: this.enterNormalMode.bind(this),
       exit:  null,
       buttons: this.handleNormalButton.bind(this),
-      changed: null,
+      changed: this.boardChangedMudate.bind(this),
     },
     drop: {
       left: {
@@ -410,30 +410,62 @@ class InputSystem extends ApeECS.System {
     console.log(`drag from [${start[0]},${start[1]}]  to  [${m[0]},${m[1]}]`);
   }
 
-  private leftMouseUpNormal(m: Vec2): void {
-    console.log('leftMouseUpNormal');
+  private leftMouseUpNormal(px: Vec2): void {
+    // console.log('leftMouseUpMutate');
   }
-  private leftMouseDownNormal(m: Vec2): void {
+  private leftMouseDownNormal(px: Vec2): void {
     console.log('leftMouseDownNormal');
+    const tile: Vec2 = this.wp.board.pixelToTile(px);
+
+    this.wp.cell.mutateCellFlip(tile);
+    this.wp.cell.notifyCellStateChanged();
   }
-  private updateMouseHoverTextNormal(v: Vec2): void {
-    // console.log(v);
-    this.hoverText.c.position.x = v[0]+10;
-    this.hoverText.c.position.y = v[1]+10;
-    // this.text.position.set(...this.wp.mouse.c.now);
+  // private updateMouseHoverTextNormal(v: Vec2): void {
+  //   // console.log(v);
+  //   this.hoverText.c.position.x = v[0]+10;
+  //   this.hoverText.c.position.y = v[1]+10;
+  //   // this.text.position.set(...this.wp.mouse.c.now);
+  // }
+
+  private updateMouseHoverTextNormal(px: Vec2): void {
+    this.hoverText.c.position.x = px[0]+10;
+    this.hoverText.c.position.y = px[1]+10;
+
+    const tile: Vec2 = this.wp.board.pixelToTile(px);
+
+    const t0 = `Normal: ${px[0]},${px[1]}`;
+
+    let t1 = '';
+    if( this.pixelInsideClickBounds(px) ) {
+
+      let description = this.wp.cell.getDescription(tile);
+
+
+      t1 = `: Tile, ${tile[0]},${tile[1]} ${description}`;
+    }
+
+    const tf = t0 + t1;
+
+    this.setHoverText(tf);
+
   }
+
 
   private enterNormalMode(): void {
     // console.log("entering normal mode");
+    this.updateStepBackButtonText();
     this.setHoverText('normal');
-    this.setButtonText(0, 'Step');
-    this.setButtonText(1, '-');
-    this.setButtonText(2, 'Mutate');
+    this.setButtonText(1, 'Step');
+    this.setButtonText(2, '-');
+    this.setButtonText(3, 'Mutate');
   }
 
   private handleNormalButton(n: number): void {
     console.log("handle normal button " + n + " on frame " + this.world.currentTick);
     switch(n) {
+      case 0:
+        this.world.createEntity({c:{StepSimulation:{forward:false}}});
+        break;
       case 1:
         // this.world.createEntity({components: [{type: 'StepSimulation'}]});
         this.world.createEntity({c:{StepSimulation:{}}});
@@ -474,7 +506,7 @@ class InputSystem extends ApeECS.System {
     this.updateStepBackButtonText();
     this.setButtonText(1, 'Step');
     this.setButtonText(2, 'Exit Mode');
-    this.setButtonText(3, 'Mutate');
+    this.setButtonText(3, '-');
   }
 
   private handleMutateButton(n: number): void {

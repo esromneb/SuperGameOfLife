@@ -696,6 +696,27 @@ class CellSystem extends ApeECS.System {
   }
 
   // istanbul ignore next
+  mutateCellFlip(tile: Vec2): void {
+    if(this.tileHasCell(tile)) {
+      const e = this.cellInTile(tile);
+      const type = e.c.cell.ctype;
+        this.destroyCell(tile);
+      // if( type === 'cell' ) {
+      //   this.spawnIce(tile);
+      // } else if( type === 'ice' ) {
+      //   this.destroyCell(tile);
+      //   this.spawnPotion(tile);
+      // } else {
+
+      //   this.destroyCell(tile);
+      // }
+      // if( )
+    } else {
+      this.spawnCell(tile);
+    }
+  }
+
+  // istanbul ignore next
   mutateCell(tile: Vec2): void {
     if(this.tileHasCell(tile)) {
       const e = this.cellInTile(tile);
