@@ -1,5 +1,8 @@
 # SuperGameOfLife
-This is an example application using [Ape-ECS](https://github.com/fritzy/ape-ecs) Entity Component System.  This is a spin on Conways Game of Life where cells can pick up potions that give them bufs and nerfs.
+This is an example application using [Ape-ECS](https://github.com/fritzy/ape-ecs) Entity Component System.  This is a my take on Conways Game of Life; cells can pick up potions that give them bufs and nerfs.
+
+## Screenshot
+![A Screenshot](https://github.com/esromneb/SuperGameOfLife/raw/master/assets/screenshot01.png)
 
 # Design
 
