@@ -9,7 +9,7 @@ git symbolic-ref HEAD refs/heads/gh-pages
 git reset
 rm .gitignore
 git pull
-git add out
+git add build
 ```
 
 Commit from here
