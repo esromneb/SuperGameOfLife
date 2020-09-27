@@ -5,13 +5,25 @@ This is an example application using [Ape-ECS](https://github.com/fritzy/ape-ecs
 
 ## Cell System
 * [CellSystem.ts](https://github.com/esromneb/SuperGameOfLife/blob/master/src/systems/CellSystem.ts)
+* This is the core game logic
+* Every tick a query is run which searches for `Entites` with the `StepSimulation` `Component` on them.
+  * In order to step the simulation, create an `Entity` like this anywhere in the application and on the next `tick` it sill step.
+  * The simulation can also be stepped backwards, this is done by the `HistorySystem`
+* 
 
 ## Board System
 * [BoardSystem.ts](https://github.com/esromneb/SuperGameOfLife/blob/master/src/systems/BoardSystem.ts)
 * This file has a few helpers for mouse handlers
 
 ## Input System
-* [BoardSystem.ts](https://github.com/esromneb/SuperGameOfLife/blob/master/src/systems/InputSystem.ts)
+* [InputSystem.ts](https://github.com/esromneb/SuperGameOfLife/blob/master/src/systems/InputSystem.ts)
+* One of the more complicated files.  This controls the `mode` property on the `UIState` `Component` which is on the `gentity` Entity.
+* The `mode` controls what the mouse does
+  * `normal` clicking will add or remove a cell
+  * `mutate` clicking will cycle through cell types
+
+## History System
+* [HistorySystem.ts](https://github.com/esromneb/SuperGameOfLife/blob/master/src/systems/HistorySystem.ts)
 * One of the more complicated files.  This controls the `mode` property on the `UIState` `Component` which is on the `gentity` Entity.
 * The `mode` controls what the mouse does
   * `normal` clicking will add or remove a cell
