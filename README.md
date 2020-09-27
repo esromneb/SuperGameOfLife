@@ -1,4 +1,14 @@
 # SuperGameOfLife
+This is an example application using [Ape-ECS](https://github.com/fritzy/ape-ecs) Entity Component System.  This is a spin on Conways Game of Life where cells can pick up potions that give them bufs and nerfs.
+
+# Design
+
+## Board System
+* [BoardSystem.ts](https://github.com/esromneb/SuperGameOfLife/blob/master/src/systems/BoardSystem.ts)
+This file has a few helpers for mouse handlers
+
+## Input System
+* [BoardSystem.ts](https://github.com/esromneb/SuperGameOfLife/blob/master/src/systems/InputSystem.ts)
 
 
 # Game Rules
