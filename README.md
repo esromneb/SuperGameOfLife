@@ -1,4 +1,4 @@
-# SuperGameOfLife
+# SuperGameOfLife [Play Now!](https://esromneb.github.io/SuperGameOfLife/build/)
 This is an example application using [Ape-ECS](https://github.com/fritzy/ape-ecs) Entity Component System.  This is a my take on Conways Game of Life; cells can pick up potions that give them bufs and nerfs.
 
 ## Screenshot
@@ -10,6 +10,8 @@ git clone https://github.com/esromneb/SuperGameOfLife.git
 cd SuperGameOfLife
 npm run dev
 ```
+
+Or just [play now in your browser.](https://esromneb.github.io/SuperGameOfLife/build/)
 
 # Design
 
