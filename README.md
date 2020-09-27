@@ -3,13 +3,19 @@ This is an example application using [Ape-ECS](https://github.com/fritzy/ape-ecs
 
 # Design
 
+## Cell System
+* [CellSystem.ts](https://github.com/esromneb/SuperGameOfLife/blob/master/src/systems/CellSystem.ts)
+
 ## Board System
 * [BoardSystem.ts](https://github.com/esromneb/SuperGameOfLife/blob/master/src/systems/BoardSystem.ts)
-This file has a few helpers for mouse handlers
+* This file has a few helpers for mouse handlers
 
 ## Input System
 * [BoardSystem.ts](https://github.com/esromneb/SuperGameOfLife/blob/master/src/systems/InputSystem.ts)
-
+* One of the more complicated files.  This controls the `mode` property on the `UIState` `Component` which is on the `gentity` Entity.
+* The `mode` controls what the mouse does
+  * `normal` clicking will add or remove a cell
+  * `mutate` clicking will cycle through cell types
 
 # Game Rules
 * Any dead cell which becomes a live cell will inherit effects from it's parents.
