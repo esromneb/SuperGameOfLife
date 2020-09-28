@@ -9,6 +9,7 @@ This is an example application using [Ape-ECS](https://github.com/fritzy/ape-ecs
 ```bash
 git clone https://github.com/esromneb/SuperGameOfLife.git
 cd SuperGameOfLife
+npm install
 npm run dev
 ```
 
